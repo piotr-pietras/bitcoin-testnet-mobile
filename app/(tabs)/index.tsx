@@ -13,6 +13,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
 import { Button, IconButton, Text } from "react-native-paper";
+import Animated, { FadeIn, SlideInDown, SlideInLeft, SlideInRight } from "react-native-reanimated";
 
 export default function WalletsScreen() {
   const infoFaucatModal = useRef<null | ModalRef>(null);
@@ -45,39 +46,43 @@ export default function WalletsScreen() {
       <View style={styles.container}>
         <ScrollView>
           <View style={styles.contentContainer}>
-            {wallets.map((v) => (
-              <WalletCard
-                key={v.id}
-                wallet={v}
-                onWalletRemoved={() => loadWallets()}
-              />
+            {wallets.map((v, i) => (
+              <Animated.View entering={SlideInLeft.delay(100 * i)}>
+                <WalletCard
+                  key={v.id}
+                  wallet={v}
+                  onWalletRemoved={() => loadWallets()}
+                />
+              </Animated.View>
             ))}
           </View>
           <View style={styles.addViewAvoid} />
         </ScrollView>
-        <IconButton
-          size={theme.sizes.l}
-          onPress={() => {
-            if (nw) {
-              nw?.startNewWallet();
-              navigate("/new-wallet/step1");
-            }
-          }}
-          style={styles.add}
-          icon={() => (
-            <Ionicons
-              name={"add-outline"}
-              size={theme.sizes.l}
-              color={theme.colors.onPrimary}
-            />
-          )}
-        />
+        <Animated.View entering={FadeIn}>
+          <IconButton
+            size={theme.sizes.l}
+            onPress={() => {
+              if (nw) {
+                nw?.startNewWallet();
+                navigate("/new-wallet/step1");
+              }
+            }}
+            style={styles.add}
+            icon={() => (
+              <Ionicons
+                name={"add-outline"}
+                size={theme.sizes.l}
+                color={theme.colors.onPrimary}
+              />
+            )}
+          />
+        </Animated.View>
         <Text style={styles.label}>Powered by Mempool & Blockdaemon</Text>
       </View>
       <Modal ref={infoFaucatModal}>
         <Text>
           In order to get some test bitcoin you need to visit a testnet3 faucats
-          and paste you p2wpkh wallet's address. You can find some
+          and paste you p2wpkh wallet's address.
         </Text>
         <TouchableOpacity
           onPress={() => {

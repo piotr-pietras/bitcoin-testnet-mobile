@@ -2,9 +2,8 @@ import { useRef } from "react";
 import WebView from "react-native-webview";
 import { StyleSheet, View } from "react-native";
 import { AppTheme, useTheme } from "@/services/theme";
-import { IconButton, Text } from "react-native-paper";
+import { IconButton } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 
 type Props = {
   uri: string;

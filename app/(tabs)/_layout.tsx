@@ -19,6 +19,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Wallets",
+          unmountOnBlur: true,
           tabBarLabel: ({ focused }) => (
             <Text
               variant="titleMedium"
@@ -41,6 +42,7 @@ export default function TabLayout() {
         options={{
           title: "More",
           headerShown:false,
+          unmountOnBlur: true,
           tabBarLabel: ({ focused }) => (
             <Text
               variant="titleMedium"

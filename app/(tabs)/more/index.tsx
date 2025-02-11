@@ -3,6 +3,7 @@ import { AppTheme, useTheme } from "@/services/theme";
 import { StyleSheet, View } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { useRouter } from "expo-router";
+import { Text } from "react-native-paper";
 
 export default function MoreScreen() {
   const theme = useTheme();
@@ -31,6 +32,7 @@ export default function MoreScreen() {
           },
         ]}
       />
+      <Text style={styles.label}>Powered by Mempool & Blockdaemon</Text>
     </View>
   );
 }
@@ -39,7 +41,13 @@ const stylesBuilder = (theme: AppTheme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      padding: theme.sizes.m,
       gap: theme.sizes.l,
+    },
+    label: {
+      position: "absolute",
+      width: "100%",
+      bottom: 0,
+      color: theme.colors.onSurfaceVariant,
+      textAlign: "center",
     },
   });

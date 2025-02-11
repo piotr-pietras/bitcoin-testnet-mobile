@@ -83,7 +83,7 @@ export default function TransactionScreen() {
                   onPress={() => {
                     Clipboard.getString().then((text) => {
                       if (text) {
-                        setAddress(text)
+                        setAddress(text);
                         addressRef.current?.setNativeProps({
                           text,
                         });
@@ -113,6 +113,10 @@ export default function TransactionScreen() {
               onChangeText={(v) => setFeeRate(v)}
               label={"Fee rate (sats/vB)"}
             />
+            <Text variant="labelMedium">
+              2 sats/vB is usually enough for testnet to include tx into first
+              block
+            </Text>
           </Section>
 
           <Section text="This are your UTXOS that are going to be used to make this transaction">

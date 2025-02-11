@@ -1,10 +1,9 @@
 {
   "expo": {
-    "name": "bitcoin-test-wallet",
+    "name": "Test wallet",
     "slug": "bitcoin-test-wallet",
     "version": "0.0.1",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
