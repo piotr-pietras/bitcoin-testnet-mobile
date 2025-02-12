@@ -1,6 +1,4 @@
-import { PinProtection } from "@/components/PinProtection";
 import { NewWalletContext } from "@/context/NewWalletContext";
-import { getPin } from "@/services/storage";
 import { queryClient } from "@/services/tanstack";
 import { theme } from "@/services/theme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -8,9 +6,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
-import { View } from "react-native";
-import { Button, PaperProvider, TextInput } from "react-native-paper";
+import { useEffect } from "react";
+import { PaperProvider } from "react-native-paper";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";

@@ -1,8 +1,9 @@
 import React from "react";
 import { Tabs } from "expo-router";
-import {  Text } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { useTheme } from "@/services/theme";
 import { Ionicons } from "@expo/vector-icons";
+import * as Device from "expo-device";
 
 export default function TabLayout() {
   const { colors, sizes } = useTheme();
@@ -10,8 +11,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerStyle: {backgroundColor: colors.surface},
-        headerTitleStyle: {color: colors.onSurface},
+        headerStyle: { backgroundColor: colors.surface },
+        headerTitleStyle: { color: colors.onSurface },
         tabBarStyle: { height: sizes.xxl, backgroundColor: colors.surface },
       }}
     >
@@ -20,14 +21,17 @@ export default function TabLayout() {
         options={{
           title: "Wallets",
           unmountOnBlur: true,
-          tabBarLabel: ({ focused }) => (
-            <Text
-              variant="titleMedium"
-              style={{ color: focused ? colors.primary : colors.backdrop }}
-            >
-              Wallets
-            </Text>
-          ),
+          tabBarLabel: ({ focused }) => {
+            if (Device.deviceType === Device.DeviceType.TABLET) return;
+            return (
+              <Text
+                variant="titleMedium"
+                style={{ color: focused ? colors.primary : colors.backdrop }}
+              >
+                Wallets
+              </Text>
+            );
+          },
           tabBarIcon: ({ size, focused }) => (
             <Ionicons
               name={"wallet"}
@@ -41,16 +45,19 @@ export default function TabLayout() {
         name="more"
         options={{
           title: "More",
-          headerShown:false,
+          headerShown: false,
           unmountOnBlur: true,
-          tabBarLabel: ({ focused }) => (
-            <Text
-              variant="titleMedium"
-              style={{ color: focused ? colors.primary : colors.backdrop }}
-            >
-              More
-            </Text>
-          ),
+          tabBarLabel: ({ focused }) => {
+            if (Device.deviceType === Device.DeviceType.TABLET) return;
+            return (
+              <Text
+                variant="titleMedium"
+                style={{ color: focused ? colors.primary : colors.backdrop }}
+              >
+                More
+              </Text>
+            );
+          },
           tabBarIcon: ({ size, focused }) => (
             <Ionicons
               name={"settings"}

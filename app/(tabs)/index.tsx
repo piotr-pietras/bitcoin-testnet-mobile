@@ -13,7 +13,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
 import { Button, IconButton, Text } from "react-native-paper";
-import Animated, { FadeIn, SlideInDown, SlideInLeft, SlideInRight } from "react-native-reanimated";
+import Animated, { FadeIn, SlideInLeft } from "react-native-reanimated";
 
 export default function WalletsScreen() {
   const infoFaucatModal = useRef<null | ModalRef>(null);
@@ -80,21 +80,17 @@ export default function WalletsScreen() {
         <Text style={styles.label}>Powered by Mempool & Blockdaemon</Text>
       </View>
       <Modal ref={infoFaucatModal}>
-        <Text>
-          In order to get some test bitcoin you need to visit a testnet3 faucats
-          and paste you p2wpkh wallet's address.
+        <Text variant="bodyLarge">
+          In order to get some test coins you need to visit a testnet3 faucats
+          and paste your p2wpkh wallet's address. You can find some links to
+          faucats in tab "More".
         </Text>
         <TouchableOpacity
-          onPress={() => {
-            navigate("/(tabs)/more/faucats");
-            setInfoFaucat(true).then(() => infoFaucatModal.current?.close());
-          }}
+          onPress={() =>
+            setInfoFaucat(true).then(() => infoFaucatModal.current?.close())
+          }
           hitSlop={10}
-        >
-          <Text variant="bodyLarge" style={styles.link}>
-            You can find some here
-          </Text>
-        </TouchableOpacity>
+        ></TouchableOpacity>
         <View style={styles.okContainer}>
           <Button
             onPress={() => {

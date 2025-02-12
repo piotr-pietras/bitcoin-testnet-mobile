@@ -119,7 +119,7 @@ export default function TransactionScreen() {
             </Text>
           </Section>
 
-          <Section text="This are your UTXOS that are going to be used to make this transaction">
+          <Section text="Those are your UTXOS that are going to be used to make this transaction">
             {isLoading ? (
               <ActivityIndicator />
             ) : (
