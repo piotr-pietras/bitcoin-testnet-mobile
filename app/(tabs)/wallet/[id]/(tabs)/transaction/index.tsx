@@ -3,7 +3,7 @@ import { UtxoCard } from "@/components/UtxoCard";
 import { useGetUtxos } from "@/hooks/useGetUtxos";
 import { AccountBTC } from "@/services/AccountBTC";
 import { AppTheme, useTheme } from "@/services/theme";
-import { TextInput as RNTextInput } from "react-native";
+import { TextInput as RNTextInput, Switch } from "react-native";
 import { validate as addressValidate } from "bitcoin-address-validation";
 import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
@@ -16,6 +16,7 @@ type States = {
   address?: string;
   amount?: string;
   feeRate?: string;
+  opReturnData?: string;
 };
 
 const validateStates = (states: States) => {
@@ -45,6 +46,12 @@ const validateStates = (states: States) => {
       errors = { ...errors, feeRate: "Fee rate must be integer" };
     }
   }
+  if (states.opReturnData) {
+    const data = Buffer.from(states.opReturnData, "utf8");
+    if (data.byteLength > 80) {
+      errors = { ...errors, opReturnData: "Data exceeds 80 bytes" };
+    }
+  }
   return errors;
 };
 
@@ -56,6 +63,10 @@ export default function TransactionScreen() {
   const [address, setAddress] = useState("");
   const [amount, setAmount] = useState("");
   const [feeRate, setFeeRate] = useState("");
+  const [rbf, setRbf] = useState(true);
+  const [opReturnData, setOpReturnData] = useState("");
+
+  const [more, setMore] = useState(false);
   const [errors, setErrors] = useState<States>({});
 
   const params = useGlobalSearchParams<{ id: string }>();
@@ -67,8 +78,8 @@ export default function TransactionScreen() {
   const disabled = noUtxos || emptyState || isLoading || hasErrors;
 
   useEffect(() => {
-    setErrors(validateStates({ address, amount, feeRate }));
-  }, [address, amount, feeRate]);
+    setErrors(validateStates({ address, amount, feeRate, opReturnData }));
+  }, [address, amount, feeRate, opReturnData]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -117,6 +128,39 @@ export default function TransactionScreen() {
               2 sats/vB is usually enough for testnet to include tx into first
               block
             </Text>
+
+            {more && (
+              <View
+                style={{
+                  gap: theme.sizes.s,
+                }}
+              >
+                <Text variant="titleMedium" style={styles.title}>
+                  Optional
+                </Text>
+                <View style={{ alignItems: "center", flexDirection: "row" }}>
+                  <Text variant="labelLarge">Replace by fee</Text>
+                  <Switch value={rbf} onValueChange={(e) => setRbf(e)} />
+                </View>
+                <TextInput
+                  mode="outlined"
+                  keyboardType="decimal-pad"
+                  onChangeText={(v) => setOpReturnData(v)}
+                  label={"OP_RETURN data"}
+                />
+                <Text variant="labelMedium">
+                  80 bytes of data that will be stored in the chain as
+                  unspendable transaction
+                </Text>
+              </View>
+            )}
+            <View style={{ alignItems: "flex-end" }}>
+              {more ? (
+                <Button onPress={() => setMore(false)}>Less</Button>
+              ) : (
+                <Button onPress={() => setMore(true)}>More</Button>
+              )}
+            </View>
           </Section>
 
           <Section text="Those are your UTXOS that are going to be used to make this transaction">
@@ -143,7 +187,7 @@ export default function TransactionScreen() {
             onPress={() => {
               navigate(
                 // @ts-ignore
-                `/(tabs)/wallet/${params.id}/(tabs)/transaction/submit?address=${address}&amount=${amount}&feeRate=${feeRate}`
+                `/(tabs)/wallet/${params.id}/(tabs)/transaction/submit?address=${address}&amount=${amount}&feeRate=${feeRate}&rbf=${rbf}&opReturnData=${opReturnData}`
               );
             }}
             mode="contained-tonal"
@@ -170,5 +214,9 @@ const stylesBuilder = (theme: AppTheme) =>
     },
     error: {
       color: theme.colors.error,
+    },
+    title: {
+      color: theme.colors.onSurfaceVariant,
+      marginVertical: theme.sizes.s,
     },
   });

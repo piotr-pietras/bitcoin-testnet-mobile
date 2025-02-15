@@ -36,9 +36,10 @@ export default function SubmitScreen() {
     address: string;
     amount: string;
     feeRate: string;
+    rbf: string;
+    opReturnData: string;
   }>();
   const { data, isSuccess, status } = useGetUtxos(params.id);
-
   useEffect(() => {
     const init = async (utxos: UTXO[]) => {
       try {
@@ -52,7 +53,8 @@ export default function SubmitScreen() {
         await transaction.create(
           params.address,
           Number(params.amount),
-          Number(params.feeRate)
+          Number(params.feeRate),
+          { rbf: params.rbf === "true", opReturnData: params.opReturnData }
         );
         await transaction.sign();
 

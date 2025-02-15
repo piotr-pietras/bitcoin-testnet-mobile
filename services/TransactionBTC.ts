@@ -1,4 +1,4 @@
-import { Psbt, networks } from "bitcoinjs-lib";
+import { Psbt, networks, payments } from "bitcoinjs-lib";
 import { Net, UTXO } from "@/types/global";
 import { AccountBTC } from "./AccountBTC";
 import { btcApi } from "./api/btc";
@@ -31,7 +31,12 @@ export class TransactionBTC {
     this.utxos = utxos;
   }
 
-  public async create(address: string, value: number, feeRate: number) {
+  public async create(
+    address: string,
+    value: number,
+    feeRate: number,
+    options?: { rbf?: boolean; opReturnData?: string }
+  ) {
     if (this.txid) throw new Error("Transaction is already done");
 
     this.value = value;
@@ -53,12 +58,24 @@ export class TransactionBTC {
       throw new Error("Account type is invalid");
     }
 
+    if (options?.opReturnData) {
+      const extraSize = Buffer.from(options.opReturnData, "utf8").byteLength;
+      size += extraSize + 4;
+    }
+
     this.fee = size * feeRate;
-    const outputs = this.prepareOutputs(address, this.value, this.fee);
+    const outputs = this.prepareOutputs(
+      address,
+      this.value,
+      this.fee,
+      options?.opReturnData
+    );
 
     this.psbt = new Psbt({ network }).addInputs(inputs).addOutputs(outputs);
     if (!this.psbt) throw new Error("Psbt has not been created");
-    inputs.forEach((_, i) => this.psbt?.setInputSequence(i, 0xffffffff - 2));
+    if (options?.rbf) {
+      inputs.forEach((_, i) => this.psbt?.setInputSequence(i, 0xffffffff - 2));
+    }
     return this;
   }
 
@@ -110,10 +127,19 @@ export class TransactionBTC {
     );
   }
 
-  private prepareOutputs(address: string, value: number, fee: number) {
+  private prepareOutputs(
+    address: string,
+    value: number,
+    fee: number,
+    opReturnData?: string
+  ) {
     const balance = this.utxos.reduce((p, c) => p + c.value, 0);
     if (balance - value - fee < 0) throw new Error("Not enough funds");
-    return [
+    const outputs: {
+      address: string;
+      value: number;
+      script?: any;
+    }[] = [
       {
         address,
         value: Number(value),
@@ -123,17 +149,21 @@ export class TransactionBTC {
         value: Number(balance - value - fee),
       },
     ];
+
+    if (opReturnData) {
+      const data = Buffer.from(opReturnData, "utf8");
+      if (data.byteLength > 80) throw new Error("OP_RETURN data size exceeded");
+      const embed = payments.embed({ data: [data] });
+      outputs.push({ value: 0, script: embed.output } as any);
+    }
+
+    return outputs;
   }
 
   public async sign() {
     if (this.txid) throw new Error("Transaction is already done");
     if (!this.psbt) throw new Error("PSBT has not been created");
     await this.psbt.signAllInputsAsync(this.account.ecPair);
-    // const isValid = this.psbt.validateSignaturesOfAllInputs(
-    //   this.account.validator
-    // );
-    // if (!isValid) throw new Error("Signature is not valid");
-
     this.psbt.finalizeAllInputs();
   }
 
