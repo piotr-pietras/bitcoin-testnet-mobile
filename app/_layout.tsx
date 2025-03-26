@@ -11,6 +11,7 @@ import { PaperProvider } from "react-native-paper";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
+import { StatusBar } from 'expo-status-bar';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -55,6 +56,7 @@ function RootLayoutNav() {
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
           <NewWalletContext>
+            <StatusBar style="light" backgroundColor={theme.colors.surface}/>
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen

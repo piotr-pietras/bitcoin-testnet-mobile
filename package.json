@@ -1,5 +1,5 @@
 {
-  "name": "bitcoin-test-wallet",
+  "name": "bitcoin-testnet-mobile",
   "main": "app/main.ts",
   "version": "0.0.1",
   "scripts": {
@@ -36,7 +36,7 @@
     "expo-router": "~3.5.23",
     "expo-secure-store": "~13.0.2",
     "expo-splash-screen": "~0.27.5",
-    "expo-status-bar": "~1.12.1",
+    "expo-status-bar": "^2.0.1",
     "expo-system-ui": "~3.0.7",
     "expo-web-browser": "^14.0.2",
     "node-libs-react-native": "^1.2.1",

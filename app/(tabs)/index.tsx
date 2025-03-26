@@ -77,7 +77,7 @@ export default function WalletsScreen() {
             )}
           />
         </Animated.View>
-        <Text style={styles.label}>Powered by Mempool & Blockdaemon</Text>
+        <Text style={styles.label}>Powered by Mempool, Blockdaemon, bitcoin-js</Text>
       </View>
       <Modal ref={infoFaucatModal}>
         <Text variant="bodyLarge">

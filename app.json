@@ -1,11 +1,16 @@
 {
   "expo": {
-    "name": "Test wallet",
-    "slug": "bitcoin-test-wallet",
-    "version": "0.0.1",
+    "name": "Testnet",
+    "slug": "bitcoin-testnet",
+    "version": "0.0.2",
     "orientation": "portrait",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
+    "backgroundColor": "#1D1F31",
+    "androidNavigationBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#1D1F31"
+    },
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
@@ -19,7 +24,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ppietras.bitcointestwallet"
+      "package": "com.ppietras.bitcointestnet"
     },
     "web": {
       "bundler": "metro",
@@ -38,7 +43,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "8ead95e4-2aa9-4a39-aaf7-c331dca9cafc"
+        "projectId": "9c5e57e2-6ba9-4c2f-a711-f03222e8c8a4"
       }
     }
   }

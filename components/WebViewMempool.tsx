@@ -32,6 +32,10 @@ export const WebViewMempool = ({ uri }: Props) => {
       <WebView
         ref={webview}
         injectedJavaScript={`
+          function backgroundColor() {
+            let elements = document.getElementsByTagName("body");
+            elements[0].style.backgroundColor = "#11131F";
+          };
           function hideHeader() {
             let elements = document.getElementsByTagName("header");
             for (let i = 0; i < elements.length; i++) {
@@ -45,6 +49,7 @@ export const WebViewMempool = ({ uri }: Props) => {
             }
           };
 
+          backgroundColor();
           hideHeader();
           hideFooter();
 
@@ -69,6 +74,7 @@ const stylesBuilder = (theme: AppTheme) =>
   StyleSheet.create({
     container: {
       flex: 1,
+      backgroundColor: "red",
     },
     refresh: {
       position: "absolute",

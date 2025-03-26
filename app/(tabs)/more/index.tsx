@@ -26,13 +26,13 @@ export default function MoreScreen() {
             iconName: "logo-github",
             onPress() {
               WebBrowser.openBrowserAsync(
-                "https://github.com/piotr-pietras/bitcoin-test-wallet"
+                "https://github.com/piotr-pietras/bitcoin-testnet-mobile"
               );
             },
           },
         ]}
       />
-      <Text style={styles.label}>Powered by Mempool & Blockdaemon</Text>
+      <Text style={styles.label}>Powered by Mempool, Blockdaemon, bitcoin-js</Text>
     </View>
   );
 }
