@@ -1,7 +1,7 @@
 {
   "name": "bitcoin-testnet-mobile",
   "main": "app/main.ts",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
@@ -27,6 +27,7 @@
     "bitcoinjs-lib": "^6.1.6",
     "buffer": "^6.0.3",
     "ecpair": "2.1.0",
+    "ethereum-blockies-base64": "^1.0.2",
     "expo": "~51.0.28",
     "expo-crypto": "~13.0.2",
     "expo-dev-client": "~4.0.29",

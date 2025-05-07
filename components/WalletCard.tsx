@@ -1,5 +1,5 @@
 import { Button, Card, IconButton, Text } from "react-native-paper";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { removeWallet, WalletStoredInfo } from "@/services/storage";
@@ -7,8 +7,9 @@ import { AppTheme, useTheme } from "@/services/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
 import Toast from "react-native-toast-message";
 import { useRouter } from "expo-router";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { Modal, ModalRef } from "./Modal";
+import makeBlockie from "ethereum-blockies-base64";
 
 type Props = {
   wallet: WalletStoredInfo;
@@ -33,6 +34,10 @@ export const WalletCard = ({ wallet, onWalletRemoved }: Props) => {
     });
   };
 
+  const blockie = useMemo(() => {
+    return makeBlockie(wallet.address);
+  }, [wallet.address]);
+
   return (
     <>
       <Card
@@ -44,11 +49,7 @@ export const WalletCard = ({ wallet, onWalletRemoved }: Props) => {
       >
         <View style={styles.titleContainer}>
           <View style={styles.titleLeftContainer}>
-            <Ionicons
-              name="wallet-outline"
-              color={theme.colors.primary}
-              size={theme.sizes.l}
-            />
+            <Image source={{ uri: blockie }} style={styles.blockie} />
             <Text
               style={{ flexShrink: 1 }}
               variant="titleMedium"
@@ -56,6 +57,7 @@ export const WalletCard = ({ wallet, onWalletRemoved }: Props) => {
             >
               {wallet.name}
             </Text>
+            
           </View>
           <TouchableOpacity onPress={() => removeModal.current?.open()}>
             <Ionicons
@@ -169,5 +171,10 @@ const stylesBuilder = (theme: AppTheme) =>
     },
     yesLabelButton: {
       color: theme.colors.onErrorContainer,
+    },
+    blockie: {
+      width: theme.sizes.xl,
+      height: theme.sizes.xl,
+      borderRadius: theme.sizes.s,
     },
   });
