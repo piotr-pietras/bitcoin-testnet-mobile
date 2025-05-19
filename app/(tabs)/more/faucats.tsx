@@ -12,49 +12,86 @@ export default function FaucatsScreen() {
   return (
     <View style={styles.container}>
       <Section text="Note that most faucats expects p2wpkh address. If you don't need coins any more send them back to the faucat.">
-        <TouchableOpacity
-          style={styles.link}
-          onPress={() =>
-            WebBrowser.openBrowserAsync("https://coinfaucet.eu/en/btc-testnet/")
-          }
-        >
-          <Ionicons
-            size={theme.sizes.l}
-            color={theme.colors.onSurface}
-            name="globe-outline"
-          />
-          <Text variant="bodyLarge">coinfaucet.eu</Text>
-        </TouchableOpacity>
+        <View style={styles.contentContainer}>
+          <Text variant="labelLarge">Testnet4</Text>
+          <TouchableOpacity
+            style={styles.link}
+            onPress={() =>
+              WebBrowser.openBrowserAsync(
+                "https://coinfaucet.eu/en/btc-testnet4/"
+              )
+            }
+          >
+            <Ionicons
+              size={theme.sizes.l}
+              color={theme.colors.onSurface}
+              name="globe-outline"
+            />
+            <Text variant="bodyLarge">coinfaucet.eu</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.link}
+            onPress={() =>
+              WebBrowser.openBrowserAsync("https://faucet.testnet4.dev/")
+            }
+          >
+            <Ionicons
+              size={theme.sizes.l}
+              color={theme.colors.onSurface}
+              name="globe-outline"
+            />
+            <Text variant="bodyLarge">faucet.testnet4.dev</Text>
+          </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity
-          style={styles.link}
-          onPress={() =>
-            WebBrowser.openBrowserAsync(
-              "https://faucet.triangleplatform.com/bitcoin/testnet"
-            )
-          }
-        >
-          <Ionicons
-            size={theme.sizes.l}
-            color={theme.colors.onSurface}
-            name="globe-outline"
-          />
-          <Text variant="bodyLarge">faucet.triangleplatform.com</Text>
-        </TouchableOpacity>
+        <View style={styles.contentContainer}>
+          <Text variant="labelLarge">Testnet3</Text>
+          <TouchableOpacity
+            style={styles.link}
+            onPress={() =>
+              WebBrowser.openBrowserAsync(
+                "https://coinfaucet.eu/en/btc-testnet/"
+              )
+            }
+          >
+            <Ionicons
+              size={theme.sizes.l}
+              color={theme.colors.onSurface}
+              name="globe-outline"
+            />
+            <Text variant="bodyLarge">coinfaucet.eu</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.link}
-          onPress={() =>
-            WebBrowser.openBrowserAsync("https://tbtc.bitaps.com/")
-          }
-        >
-          <Ionicons
-            size={theme.sizes.l}
-            color={theme.colors.onSurface}
-            name="globe-outline"
-          />
-          <Text variant="bodyLarge">tbtc.bitaps.com</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.link}
+            onPress={() =>
+              WebBrowser.openBrowserAsync(
+                "https://faucet.triangleplatform.com/bitcoin/testnet"
+              )
+            }
+          >
+            <Ionicons
+              size={theme.sizes.l}
+              color={theme.colors.onSurface}
+              name="globe-outline"
+            />
+            <Text variant="bodyLarge">faucet.triangleplatform.com</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.link}
+            onPress={() =>
+              WebBrowser.openBrowserAsync("https://tbtc.bitaps.com/")
+            }
+          >
+            <Ionicons
+              size={theme.sizes.l}
+              color={theme.colors.onSurface}
+              name="globe-outline"
+            />
+            <Text variant="bodyLarge">tbtc.bitaps.com</Text>
+          </TouchableOpacity>
+        </View>
       </Section>
     </View>
   );
@@ -68,7 +105,11 @@ const stylesBuilder = (theme: AppTheme) =>
       gap: theme.sizes.l,
     },
     contentContainer: {
-      backgroundColor: theme.colors.surface,
+      padding: theme.sizes.m,
+      borderRadius: theme.sizes.m,
+      borderWidth: 1,
+      borderColor: theme.colors.outline,
+      gap: theme.sizes.s,
     },
     label: {
       color: theme.colors.onSurfaceVariant,
@@ -77,6 +118,5 @@ const stylesBuilder = (theme: AppTheme) =>
       flexDirection: "row",
       alignItems: "center",
       gap: theme.sizes.s,
-      marginBottom: theme.sizes.s,
     },
   });

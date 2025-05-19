@@ -1,4 +1,4 @@
-import { AddressType } from "@/types/global";
+import { AddressType, Net } from "@/types/global";
 import * as Crypto from "expo-crypto";
 import * as SecureStore from "expo-secure-store";
 
@@ -12,12 +12,14 @@ export type WalletStoredInfo = {
   address: string;
   type: AddressType;
   name: string;
+  net: Net;
 };
 
 export const saveWallet = async (
   privKey: Uint8Array,
   address: string,
   type: AddressType,
+  net: Net,
   walletName?: string
 ) => {
   const id = Crypto.randomUUID();
@@ -29,12 +31,12 @@ export const saveWallet = async (
     const walletsParsed = JSON.parse(wallets) as WalletStoredInfo[];
     const walletsParsedExtended = [
       ...walletsParsed,
-      { id, address, type, name },
+      { id, address, type, name, net },
     ];
     const toWrite = JSON.stringify(walletsParsedExtended);
     await SecureStore.setItemAsync(SECURE_STORE_KEYS.WALLETS, toWrite);
   } else {
-    const toWrite = JSON.stringify([{ id, address, type, name }]);
+    const toWrite = JSON.stringify([{ id, address, type, name, net }]);
     await SecureStore.setItemAsync(SECURE_STORE_KEYS.WALLETS, toWrite);
   }
 };

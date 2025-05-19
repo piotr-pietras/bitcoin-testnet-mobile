@@ -1,8 +1,6 @@
 import { AddressType, Blockchain, Net } from "@/types/global";
 import { networks, payments } from "bitcoinjs-lib";
 import ecc from "@bitcoinerlab/secp256k1";
-// import * as ecc from "tiny-secp256k1";
-// import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import ECPairFactory, { ECPairInterface } from "ecpair";
 
 export class AccountBTC {
@@ -16,7 +14,7 @@ export class AccountBTC {
   constructor(privKey: Uint8Array, net: Net, type: AddressType) {
     this.net = net;
     this.type = type;
-    const network = this.net === "MAIN" ? networks.bitcoin : networks.testnet;
+    const network =  networks.testnet;
 
     const ECPair = ECPairFactory(ecc);
     this.ecPair = ECPair.fromPrivateKey(Buffer.from(privKey), { network });

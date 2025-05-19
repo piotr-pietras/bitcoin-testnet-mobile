@@ -8,11 +8,12 @@ import {
   WalletStoredInfo,
 } from "@/services/storage";
 import { AppTheme, useTheme } from "@/services/theme";
+import { Net } from "@/types/global";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
-import { Button, IconButton, Text } from "react-native-paper";
+import { Button, IconButton, SegmentedButtons, Text } from "react-native-paper";
 import Animated, { FadeIn, SlideInLeft } from "react-native-reanimated";
 
 export default function WalletsScreen() {
@@ -22,6 +23,11 @@ export default function WalletsScreen() {
   const { navigate } = useRouter();
   const nw = useNewWalletContext();
   const [wallets, setWallets] = useState<WalletStoredInfo[]>([]);
+  const [net, setNet] = useState<Net>("TEST4");
+  const filteredWallets = useMemo(
+    () => wallets.filter((v) => v.net === net),
+    [wallets, net]
+  );
 
   const loadWallets = () => {
     getWallets().then((v) => setWallets(v));
@@ -44,15 +50,26 @@ export default function WalletsScreen() {
   return (
     <>
       <View style={styles.container}>
+        <SegmentedButtons
+          style={styles.segmentedButtons}
+          value={net}
+          onValueChange={(v) => setNet(v as Net)}
+          buttons={[
+            {
+              value: "TEST",
+              label: "Testnet3",
+            },
+            {
+              value: "TEST4",
+              label: "Testnet4",
+            },
+          ]}
+        />
         <ScrollView>
           <View style={styles.contentContainer}>
-            {wallets.map((v, i) => (
-              <Animated.View entering={SlideInLeft.delay(100 * i)}>
-                <WalletCard
-                  key={v.id}
-                  wallet={v}
-                  onWalletRemoved={() => loadWallets()}
-                />
+            {filteredWallets.map((v, i) => (
+              <Animated.View key={v.id} entering={SlideInLeft.delay(100 * i)}>
+                <WalletCard wallet={v} onWalletRemoved={() => loadWallets()} />
               </Animated.View>
             ))}
           </View>
@@ -77,7 +94,9 @@ export default function WalletsScreen() {
             )}
           />
         </Animated.View>
-        <Text style={styles.label}>Powered by Mempool, Blockdaemon, bitcoin-js</Text>
+        <Text style={styles.label}>
+          Powered by Mempool, Blockdaemon, bitcoin-js
+        </Text>
       </View>
       <Modal ref={infoFaucatModal}>
         <Text variant="bodyLarge">
@@ -110,6 +129,9 @@ const stylesBuilder = (theme: AppTheme) =>
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
+    },
+    segmentedButtons: {
+      margin: theme.sizes.m,
     },
     contentContainer: {
       flex: 1,

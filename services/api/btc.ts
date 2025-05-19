@@ -38,16 +38,16 @@ export type GetUtxos = {
 };
 
 export const btcApi = {
-  async getUtxos(address: string, all?: boolean): Promise<GetUtxos> {
-    const client = await universalBtcApiClient();
+  async getUtxos(address: string, net: Net, all?: boolean): Promise<GetUtxos> {
+    const client = await universalBtcApiClient(net);
     const res = await client.get(
       `/account/${address}/utxo${all ? "?check_mempool=true" : ""}`
     );
     return res.data;
   },
 
-  async getRawTx(txId: string): Promise<{ result: string }> {
-    const client = await nativeBtcApiClient();
+  async getRawTx(txId: string, net: Net): Promise<{ result: string }> {
+    const client = await nativeBtcApiClient(net);
     const res = await client.post("/", {
       jsonrpc: "2.0",
       id: 1,
@@ -57,8 +57,8 @@ export const btcApi = {
     return res.data;
   },
 
-  async submitSignedTx(tx: string): Promise<{ id: string }> {
-    const client = await universalBtcApiClient();
+  async submitSignedTx(tx: string, net: Net): Promise<{ id: string }> {
+    const client = await universalBtcApiClient(net);
     const payload = JSON.stringify({ tx });
     const res = await client.post("/tx/send", payload);
     return res.data;

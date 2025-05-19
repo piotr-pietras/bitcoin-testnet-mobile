@@ -1,6 +1,7 @@
 import { WebViewMempool } from "@/components/WebViewMempool";
 import { getWallet, WalletStoredInfo } from "@/services/storage";
 import { useTheme } from "@/services/theme";
+import { NetNamePath } from "@/types/global";
 import { Stack, useGlobalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
@@ -26,7 +27,7 @@ export default function WalletsScreen() {
       <View style={{ flex: 1 }}>
         {wallet && (
           <WebViewMempool
-            uri={`https://mempool.space/testnet/address/${wallet?.address}`}
+            uri={`https://mempool.space/${NetNamePath[wallet?.net || "TEST"]}/address/${wallet?.address}`}
           />
         )}
       </View>

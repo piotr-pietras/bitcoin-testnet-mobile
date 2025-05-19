@@ -2,7 +2,7 @@ import { useGetUtxos } from "@/hooks/useGetUtxos";
 import { AccountBTC } from "@/services/AccountBTC";
 import { getWallet, getWalletPrivKey } from "@/services/storage";
 import { AppTheme, useTheme } from "@/services/theme";
-import { UTXO } from "@/types/global";
+import { Net, UTXO } from "@/types/global";
 import { Stack, useGlobalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
@@ -14,6 +14,7 @@ import { TransactionBTC } from "@/services/TransactionBTC";
 export default function SubmitScreen() {
   const theme = useTheme();
   const styles = stylesBuilder(theme);
+  const [net, setNet] = useState<Net | null>(null);
   const [isInit, setIsInit] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { navigate } = useRouter();
@@ -48,7 +49,7 @@ export default function SubmitScreen() {
         if (!wallet.type)
           throw new Error("Wallet type has not been retrieved from cache");
 
-        const account = new AccountBTC(privKey, "TEST", wallet.type);
+        const account = new AccountBTC(privKey, wallet.net, wallet.type);
         const transaction = new TransactionBTC(account, utxos);
         await transaction.create(
           params.address,
@@ -58,6 +59,7 @@ export default function SubmitScreen() {
         );
         await transaction.sign();
 
+        setNet(wallet.net);
         setTransaction(transaction);
         setIsInit(true);
       } catch (error) {
@@ -85,44 +87,43 @@ export default function SubmitScreen() {
     );
 
   return (
-    <>
-      <View style={{ flex: 1 }}>
-        <ScrollView>
-          <View style={styles.container}>
-            <Text variant="bodyMedium">{`Address: ${transaction?.address}`}</Text>
-            <Text variant="bodyMedium">{`Value: ${transaction?.value} (${
-              transaction?.value! / Math.pow(10, AccountBTC.decimals)
-            } btc)`}</Text>
-            <Text variant="bodyMedium">{`Fee: ${transaction?.fee} (${
-              transaction?.fee! / Math.pow(10, AccountBTC.decimals)
-            } btc)`}</Text>
-            {!txId ? (
-              <Button
-                loading={isPending}
-                disabled={isPending}
-                onPress={() => mutate()}
-                mode="contained-tonal"
-              >
-                Submit transaction
-              </Button>
-            ) : (
-              <TouchableOpacity
-                onPress={() => {
-                  navigate(`/(tabs)/wallet/[id]/(tabs)/transaction/${txId}`);
-                }}
-              >
-                <Card style={styles.successContainer}>
-                  <Text
-                    variant="bodyLarge"
-                    style={styles.success}
-                  >{`${txId} \n(tap to get more info)`}</Text>
-                </Card>
-              </TouchableOpacity>
-            )}
-          </View>
-        </ScrollView>
+    <ScrollView>
+      <View style={styles.container}>
+        <Text variant="bodyMedium">{`Address: ${transaction?.address}`}</Text>
+        <Text variant="bodyMedium">{`Value: ${transaction?.value} (${
+          transaction?.value! / Math.pow(10, AccountBTC.decimals)
+        } btc)`}</Text>
+        <Text variant="bodyMedium">{`Fee: ${transaction?.fee} (${
+          transaction?.fee! / Math.pow(10, AccountBTC.decimals)
+        } btc)`}</Text>
+        {!txId ? (
+          <Button
+            loading={isPending}
+            disabled={isPending}
+            onPress={() => mutate()}
+            mode="contained-tonal"
+          >
+            Submit transaction
+          </Button>
+        ) : (
+          <TouchableOpacity
+            onPress={() => {
+              navigate(
+                // @ts-ignore
+                `/(tabs)/wallet/[id]/(tabs)/transaction/${txId}?net=${net}`
+              );
+            }}
+          >
+            <Card style={styles.successContainer}>
+              <Text
+                variant="bodyLarge"
+                style={styles.success}
+              >{`${txId} \n(tap to get more info)`}</Text>
+            </Card>
+          </TouchableOpacity>
+        )}
       </View>
-    </>
+    </ScrollView>
   );
 }
 

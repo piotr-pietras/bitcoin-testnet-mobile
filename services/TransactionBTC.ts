@@ -43,8 +43,7 @@ export class TransactionBTC {
     this.address = address;
     this.feeRate = feeRate;
 
-    const { net } = this.account;
-    const network = this.getNetwork(net);
+    const network =  networks.testnet;
 
     let inputs: Input[];
     let size: number;
@@ -90,7 +89,7 @@ export class TransactionBTC {
       this.utxos.map(
         ({ tx_id, index }) =>
           new Promise(async (resolve) => {
-            const { result } = await btcApi.getRawTx(tx_id);
+            const { result } = await btcApi.getRawTx(tx_id, this.account.net);
             resolve({
               hash: tx_id,
               index,
@@ -172,13 +171,8 @@ export class TransactionBTC {
     if (!this.psbt) throw new Error("PSBT has not been created");
 
     const tx = this.psbt.extractTransaction().toHex();
-    const res = await btcApi.submitSignedTx(tx);
+    const res = await btcApi.submitSignedTx(tx, this.account.net);
     this.txid = res.id;
     return this.txid;
-  }
-
-  private getNetwork(net: Net) {
-    const { bitcoin, testnet } = networks;
-    return net === "MAIN" ? bitcoin : testnet;
   }
 }

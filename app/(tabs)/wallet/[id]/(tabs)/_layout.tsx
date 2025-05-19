@@ -1,11 +1,14 @@
 import React from "react";
-import { Tabs } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import { Chip } from "react-native-paper";
 import { AppTheme, useTheme } from "@/services/theme";
 import { ScrollView, View, StyleSheet } from "react-native";
 
+export const WALLET_TABBAR_HEIGHT = 54;
+
 export default function TabLayout() {
   const theme = useTheme();
+  const { navigate } = useRouter();
   const styles = stylesBuilder(theme);
 
   return (
@@ -45,7 +48,7 @@ export default function TabLayout() {
         name="transaction"
         options={{
           title: "Transaction",
-          unmountOnBlur: true,
+          freezeOnBlur: true,
           headerShown: false,
         }}
       />
@@ -64,9 +67,11 @@ const stylesBuilder = (theme: AppTheme) =>
   StyleSheet.create({
     chip: {
       margin: 10,
+      alignItems: "center",
+      justifyContent: "center",
     },
     container: {
       backgroundColor: theme.colors.surface,
-      height: 55,
+      height: WALLET_TABBAR_HEIGHT,
     },
   });

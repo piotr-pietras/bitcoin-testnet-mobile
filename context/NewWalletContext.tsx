@@ -10,6 +10,7 @@ import {
 } from "react";
 import { AccountBTC } from "@/services/AccountBTC";
 import { saveWallet } from "@/services/storage";
+import { Net } from "@/types/global";
 
 type ContextValues =
   | {
@@ -19,6 +20,8 @@ type ContextValues =
       previousStep: () => void;
       step: number;
       allowGenerate: boolean;
+      net: Net;
+      setNet: Dispatch<SetStateAction<Net>>;
       type: "p2pkh" | "p2wpkh";
       setType: Dispatch<SetStateAction<"p2pkh" | "p2wpkh">>;
       name: string;
@@ -33,6 +36,7 @@ const Context = createContext<ContextValues>(undefined);
 export const NewWalletContext = (props: PropsWithChildren) => {
   const [step, setStep] = useState(1);
   const { replace } = useRouter();
+  const [net, setNet] = useState<Net>("TEST");
   const [type, setType] = useState<"p2pkh" | "p2wpkh">("p2pkh");
   const [phrase, setPhrase] = useState("");
   const [name, setName] = useState("");
@@ -52,8 +56,8 @@ export const NewWalletContext = (props: PropsWithChildren) => {
   };
   const generateNewWallet = () => {
     const privKey = sha256(phrase);
-    const account = new AccountBTC(privKey, "TEST", type);
-    saveWallet(privKey, account.address, type, name);
+    const account = new AccountBTC(privKey, net, type);
+    saveWallet(privKey, account.address, type, net, name);
   };
 
   const allowGenerate = !!phrase;
@@ -68,6 +72,8 @@ export const NewWalletContext = (props: PropsWithChildren) => {
         step,
         allowGenerate,
         type,
+        net,
+        setNet,
         setType,
         name,
         setName,

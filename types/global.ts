@@ -2,11 +2,11 @@ export type Blockchain = "BTC" | "ETH";
 
 export type AddressType = "p2pkh" | "p2wpkh";
 
-export type Net = "MAIN" | "TEST";
+export type Net = "TEST" | "TEST4";
 
-export const NetName: { [keys in Blockchain]: { [keys in Net]: string } } = {
-  BTC: { MAIN: "mainnet", TEST: "testnet" },
-  ETH: { MAIN: "mainnet", TEST: "sepolia" },
+export const NetNamePath: { [keys in Net]: string } = {
+  TEST: "testnet",
+  TEST4: "testnet4",
 } as const;
 
 export type UTXO = {

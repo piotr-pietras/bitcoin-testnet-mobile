@@ -17,7 +17,7 @@ export const useGetUtxos = (id: string, all?: boolean) => {
     enabled: !!wallet,
     queryKey: ["utxos", id],
     staleTime: 10000,
-    queryFn: async () => await btcApi.getUtxos(wallet!.address, all),
+    queryFn: async () => await btcApi.getUtxos(wallet!.address, wallet!.net, all),
     select,
   });
 };

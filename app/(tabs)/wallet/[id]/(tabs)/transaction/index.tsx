@@ -11,6 +11,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { ActivityIndicator, Button, Text, TextInput } from "react-native-paper";
 import validator from "validator";
 import Clipboard from "@react-native-clipboard/clipboard";
+import Animated, { useAnimatedKeyboard } from "react-native-reanimated";
 
 type States = {
   address?: string;
@@ -59,6 +60,7 @@ export default function TransactionScreen() {
   const theme = useTheme();
   const styles = stylesBuilder(theme);
   const { navigate } = useRouter();
+  const keyboard = useAnimatedKeyboard();
   const addressRef = useRef<RNTextInput>(null);
   const [address, setAddress] = useState("");
   const [amount, setAmount] = useState("");
@@ -82,121 +84,121 @@ export default function TransactionScreen() {
   }, [address, amount, feeRate, opReturnData]);
 
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView>
-        <View style={styles.container}>
-          <Section text="Fill transaction">
-            <TextInput
-              ref={addressRef}
-              right={
-                <TextInput.Icon
-                  icon="clipboard"
-                  onPress={() => {
-                    Clipboard.getString().then((text) => {
-                      if (text) {
-                        setAddress(text);
-                        addressRef.current?.setNativeProps({
-                          text,
-                        });
-                      }
-                    });
-                  }}
-                />
-              }
-              mode="outlined"
-              onChangeText={(v) => setAddress(v)}
-              label={"Address"}
-            />
-            <TextInput
-              mode="outlined"
-              keyboardType="decimal-pad"
-              onChangeText={(v) => setAmount(v)}
-              label={"Amount (satoshi)"}
-            />
-            <Text variant="labelMedium">
-              {`${Number(amount)} satoshi = ${
-                Number(amount) / Math.pow(10, AccountBTC.decimals)
-              } btc`}
-            </Text>
-            <TextInput
-              mode="outlined"
-              keyboardType="decimal-pad"
-              onChangeText={(v) => setFeeRate(v)}
-              label={"Fee rate (sats/vB)"}
-            />
-            <Text variant="labelMedium">
-              2 sats/vB is usually enough for testnet to include tx into first
-              block
-            </Text>
-
-            {more && (
-              <View
-                style={{
-                  gap: theme.sizes.s,
+    <ScrollView>
+      <View style={styles.container}>
+        <Section text="Fill transaction">
+          <TextInput
+            ref={addressRef}
+            right={
+              <TextInput.Icon
+                icon="clipboard"
+                onPress={() => {
+                  Clipboard.getString().then((text) => {
+                    if (text) {
+                      setAddress(text);
+                      addressRef.current?.setNativeProps({
+                        text,
+                      });
+                    }
+                  });
                 }}
-              >
-                <Text variant="titleMedium" style={styles.title}>
-                  Optional
-                </Text>
-                <View style={{ alignItems: "center", flexDirection: "row" }}>
-                  <Text variant="labelLarge">Replace by fee</Text>
-                  <Switch value={rbf} onValueChange={(e) => setRbf(e)} />
-                </View>
-                <TextInput
-                  mode="outlined"
-                  keyboardType="decimal-pad"
-                  onChangeText={(v) => setOpReturnData(v)}
-                  label={"OP_RETURN data"}
-                />
-                <Text variant="labelMedium">
-                  80 bytes of data that will be stored in the chain as
-                  unspendable transaction
-                </Text>
-              </View>
-            )}
-            <View style={{ alignItems: "flex-end" }}>
-              {more ? (
-                <Button onPress={() => setMore(false)}>Less</Button>
-              ) : (
-                <Button onPress={() => setMore(true)}>More</Button>
-              )}
-            </View>
-          </Section>
+              />
+            }
+            mode="outlined"
+            onChangeText={(v) => setAddress(v)}
+            label={"Address"}
+          />
+          <TextInput
+            mode="outlined"
+            keyboardType="decimal-pad"
+            onChangeText={(v) => setAmount(v)}
+            label={"Amount (satoshi)"}
+          />
+          <Text variant="labelMedium">
+            {`${Number(amount)} satoshi = ${
+              Number(amount) / Math.pow(10, AccountBTC.decimals)
+            } btc`}
+          </Text>
+          <TextInput
+            mode="outlined"
+            keyboardType="decimal-pad"
+            onChangeText={(v) => setFeeRate(v)}
+            label={"Fee rate (sats/vB)"}
+          />
+          <Text variant="labelMedium">
+            2 sats/vB is usually enough for testnet to include tx into first
+            block
+          </Text>
 
-          <Section text="Those are your UTXOS that are going to be used to make this transaction">
-            {isLoading ? (
-              <ActivityIndicator />
-            ) : (
-              <View style={styles.utxosContainer}>
-                {noUtxos && (
-                  <Text variant="bodyMedium">No utxos to spent :(</Text>
-                )}
-                {utxos?.map((utxo) => (
-                  <UtxoCard key={utxo.tx_id} utxo={utxo} small selected />
-                ))}
+          {more && (
+            <View
+              style={{
+                gap: theme.sizes.s,
+              }}
+            >
+              <Text variant="titleMedium" style={styles.title}>
+                Optional
+              </Text>
+              <View style={{ alignItems: "center", flexDirection: "row" }}>
+                <Text variant="labelLarge">Replace by fee</Text>
+                <Switch value={rbf} onValueChange={(e) => setRbf(e)} />
               </View>
+              <TextInput
+                mode="outlined"
+                keyboardType="decimal-pad"
+                onChangeText={(v) => setOpReturnData(v)}
+                label={"OP_RETURN data"}
+              />
+              <Text variant="labelMedium">
+                80 bytes of data that will be stored in the chain as unspendable
+                transaction
+              </Text>
+            </View>
+          )}
+          <View style={{ alignItems: "flex-end" }}>
+            {more ? (
+              <Button onPress={() => setMore(false)}>Less</Button>
+            ) : (
+              <Button onPress={() => setMore(true)}>More</Button>
             )}
-          </Section>
-          <View>
-            {Object.values(errors).map((v) => (
-              <Text style={styles.error}>{`• ${v}`}</Text>
-            ))}
           </View>
-          <Button
-            disabled={disabled}
-            onPress={() => {
-              navigate(
-                // @ts-ignore
-                `/(tabs)/wallet/${params.id}/(tabs)/transaction/submit?address=${address}&amount=${amount}&feeRate=${feeRate}&rbf=${rbf}&opReturnData=${opReturnData}`
-              );
-            }}
-            mode="contained-tonal"
-          >
-            Create and sign transaction
-          </Button>
+        </Section>
+
+        <Section text="Those are your UTXOS that are going to be used to make this transaction">
+          {isLoading ? (
+            <ActivityIndicator />
+          ) : (
+            <View style={styles.utxosContainer}>
+              {noUtxos && (
+                <Text variant="bodyMedium">No utxos to spent :(</Text>
+              )}
+              {utxos?.map((utxo) => (
+                <UtxoCard key={utxo.tx_id} utxo={utxo} small selected />
+              ))}
+            </View>
+          )}
+        </Section>
+        <View>
+          {Object.values(errors).map((v) => (
+            <Text style={styles.error}>{`• ${v}`}</Text>
+          ))}
         </View>
-      </ScrollView>
-    </View>
+        <Button
+          disabled={disabled}
+          onPress={() => {
+            navigate(
+              // @ts-ignore
+              `/(tabs)/wallet/${params.id}/(tabs)/transaction/submit?address=${address}&amount=${amount}&feeRate=${feeRate}&rbf=${rbf}&opReturnData=${opReturnData}`
+            );
+          }}
+          mode="contained-tonal"
+        >
+          Create and sign transaction
+        </Button>
+      </View>
+
+      <Animated.View style={{ height: keyboard.height }} />
+    </ScrollView>
   );
 }
 
