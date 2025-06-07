@@ -1,33 +1,41 @@
 import React from "react";
-import { Tabs, useRouter } from "expo-router";
+import { Tabs, } from "expo-router";
 import { Chip } from "react-native-paper";
 import { AppTheme, useTheme } from "@/services/theme";
-import { ScrollView, View, StyleSheet } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export const WALLET_TABBAR_HEIGHT = 54;
 
 export default function TabLayout() {
   const theme = useTheme();
-  const { navigate } = useRouter();
   const styles = stylesBuilder(theme);
+  const { top } = useSafeAreaInsets();
 
   return (
     <Tabs
       tabBar={(props) => (
         <View style={styles.container}>
           <ScrollView horizontal>
-            {Object.values(props.descriptors).map((v) => (
-              <Chip
-                selected={
-                  v.route.name === props.state.routeNames[props.state.index]
-                }
-                showSelectedOverlay
-                onPress={() => v.navigation.navigate(v.route.name)}
-                style={styles.chip}
-              >
-                {v.options.title}
-              </Chip>
-            ))}
+            {Object.values(props.descriptors).map((v) => {
+              const selected =
+                v.route.name === props.state.routeNames[props.state.index];
+              return (
+                <Chip
+                  key={v.route.name}
+                  showSelectedOverlay
+                  onPress={() => v.navigation.navigate(v.route.name)}
+                  style={[
+                    styles.chip,
+                    selected ? styles.selectedChip : undefined,
+                  ]}
+                  textStyle={selected ? styles.selectedChipText : undefined}
+                  mode="outlined"
+                >
+                  {v.options.title}
+                </Chip>
+              );
+            })}
           </ScrollView>
         </View>
       )}
@@ -35,28 +43,40 @@ export default function TabLayout() {
         tabBarStyle: { height: theme.sizes.xxl },
         headerStyle: { backgroundColor: theme.colors.surface },
         headerTitleStyle: { color: theme.colors.onSurface },
+        headerShown: false,
+        animation: "fade",
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
+          sceneStyle: {
+            paddingTop: top,
+            backgroundColor: theme.colors.background,
+          },
           title: "Wallet",
-          unmountOnBlur: true,
+          freezeOnBlur: true,
         }}
       />
       <Tabs.Screen
         name="transaction"
         options={{
           title: "Transaction",
-          freezeOnBlur: true,
-          headerShown: false,
+          popToTopOnBlur: true,
+        }}
+      />
+      <Tabs.Screen
+        name="faucats"
+        options={{
+          title: "Faucats",
+          popToTopOnBlur: true,
         }}
       />
       <Tabs.Screen
         name="utxos"
         options={{
           title: "UTXOs",
-          unmountOnBlur: true,
+          freezeOnBlur: true,
         }}
       />
     </Tabs>
@@ -69,6 +89,14 @@ const stylesBuilder = (theme: AppTheme) =>
       margin: 10,
       alignItems: "center",
       justifyContent: "center",
+    },
+    selectedChip: {
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: theme.sizes.m,
+    },
+    selectedChipText: {
+      color: theme.colors.onPrimary,
+      fontWeight: "bold",
     },
     container: {
       backgroundColor: theme.colors.surface,

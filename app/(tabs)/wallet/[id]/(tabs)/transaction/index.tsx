@@ -1,60 +1,25 @@
 import { Section } from "@/components/Section";
 import { UtxoCard } from "@/components/UtxoCard";
 import { useGetUtxos } from "@/hooks/useGetUtxos";
-import { AccountBTC } from "@/services/AccountBTC";
+import { AccountBTC } from "@/services/btc/AccountBTC";
 import { AppTheme, useTheme } from "@/services/theme";
-import { TextInput as RNTextInput, Switch } from "react-native";
-import { validate as addressValidate } from "bitcoin-address-validation";
-import { useGlobalSearchParams, useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import {
+  FlatList,
+  RefreshControl,
+  TextInput as RNTextInput,
+  Switch,
+  TouchableOpacity,
+} from "react-native";
+import { useFocusEffect, useGlobalSearchParams, useRouter } from "expo-router";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { ActivityIndicator, Button, Text, TextInput } from "react-native-paper";
-import validator from "validator";
 import Clipboard from "@react-native-clipboard/clipboard";
-import Animated, { useAnimatedKeyboard } from "react-native-reanimated";
-
-type States = {
-  address?: string;
-  amount?: string;
-  feeRate?: string;
-  opReturnData?: string;
-};
-
-const validateStates = (states: States) => {
-  let errors: { [keys in keyof typeof states]?: string | undefined } = {};
-
-  if (states.address) {
-    if (!addressValidate(states.address)) {
-      errors = { ...errors, address: "Invalid bitcoin address" };
-    }
-  }
-  if (states.amount) {
-    if (Number(states.amount) < 148) {
-      errors = {
-        ...errors,
-        feeRate: "Amount lesser than 148 may be considered as dust",
-      };
-    }
-    if (!validator.isInt(states.amount)) {
-      errors = { ...errors, amount: "Amount must be integer" };
-    }
-  }
-  if (states.feeRate) {
-    if (Number(states.feeRate) < 1) {
-      errors = { ...errors, feeRate: "Fee rate must be at least 1" };
-    }
-    if (!validator.isInt(states.feeRate)) {
-      errors = { ...errors, feeRate: "Fee rate must be integer" };
-    }
-  }
-  if (states.opReturnData) {
-    const data = Buffer.from(states.opReturnData, "utf8");
-    if (data.byteLength > 80) {
-      errors = { ...errors, opReturnData: "Data exceeds 80 bytes" };
-    }
-  }
-  return errors;
-};
+import Animated, { FadeIn, useAnimatedKeyboard } from "react-native-reanimated";
+import { UTXO } from "@/types/global";
+import { getWallet, WalletStoredInfo } from "@/services/storage";
+import { useValidateTxStates } from "@/hooks/useValidateTxStates";
+import { SizeBTC } from "@/services/btc/SizeBTC";
 
 export default function TransactionScreen() {
   const theme = useTheme();
@@ -62,76 +27,196 @@ export default function TransactionScreen() {
   const { navigate } = useRouter();
   const keyboard = useAnimatedKeyboard();
   const addressRef = useRef<RNTextInput>(null);
+  const [wallet, setWallet] = useState<WalletStoredInfo | null>(null);
   const [address, setAddress] = useState("");
   const [amount, setAmount] = useState("");
   const [feeRate, setFeeRate] = useState("");
   const [rbf, setRbf] = useState(true);
   const [opReturnData, setOpReturnData] = useState("");
+  const [selectedUtxos, setSelectedUtxos] = useState<UTXO[]>([]);
 
   const [more, setMore] = useState(false);
-  const [errors, setErrors] = useState<States>({});
+  const { error, info, transaction } = useValidateTxStates({
+    wallet,
+    address,
+    amount,
+    feeRate,
+    opReturnData,
+    selectedUtxos,
+  });
 
   const params = useGlobalSearchParams<{ id: string }>();
-  const { data: utxos, isLoading } = useGetUtxos(params.id, true);
-  const noUtxos = utxos?.length === 0 && !isLoading;
+  const { data: utxos, isLoading, refetch } = useGetUtxos(params.id, true);
+  const spendableUtxos = utxos?.filter(
+    (utxo) => !utxo.is_spent && utxo.status === "mined"
+  );
+  const noUtxos = spendableUtxos?.length === 0 && !isLoading;
+  const pendingUtxos = utxos?.filter(
+    (utxo) => !utxo.is_spent && utxo.status === "pending"
+  );
 
-  const emptyState = !address || !amount || !feeRate;
-  const hasErrors = !!Object.values(errors).length;
+  const emptyState = !address || !amount || !feeRate || !selectedUtxos.length;
+  const hasErrors = !!Object.values(error).length;
   const disabled = noUtxos || emptyState || isLoading || hasErrors;
+  const hasAnySpendable =
+    !!transaction?.spendable && transaction?.spendable > 0;
+
+  const onSelectUtxo = (utxo: UTXO) => {
+    if (selectedUtxos.includes(utxo)) {
+      setSelectedUtxos(selectedUtxos.filter((v) => v.tx_id !== utxo.tx_id));
+    } else {
+      setSelectedUtxos([...selectedUtxos, utxo]);
+    }
+  };
+
+  const onCreateTransaction = () => {
+    navigate({
+      pathname: `/wallet/[id]/transaction/submit`,
+      params: {
+        id: params.id,
+        address,
+        amount,
+        feeRate,
+        opReturnData,
+        rbf: rbf.toString(),
+        utxosIds: selectedUtxos.map((utxo) => utxo.tx_id).join(","),
+      },
+    });
+  };
 
   useEffect(() => {
-    setErrors(validateStates({ address, amount, feeRate, opReturnData }));
-  }, [address, amount, feeRate, opReturnData]);
+    getWallet(params.id).then((wallet) => {
+      setWallet(wallet);
+    });
+  }, [params.id]);
+
+  useEffect(() => {
+    setAddress("");
+    setAmount("");
+    setFeeRate("1");
+    setOpReturnData("");
+    setSelectedUtxos([]);
+  }, [params.id]);
+
+  useFocusEffect(() => {
+    const selectedUtxosIds = selectedUtxos.map((utxo) => utxo.tx_id);
+    const spendableUtxosIds = spendableUtxos?.map((utxo) => utxo.tx_id);
+    const filteredUtxos = selectedUtxosIds.filter((id) =>
+      spendableUtxosIds?.includes(id)
+    );
+    if (filteredUtxos.length !== selectedUtxos.length) {
+      setSelectedUtxos([]);
+    }
+  });
 
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl onRefresh={() => refetch()} refreshing={isLoading} />
+      }
+    >
       <View style={styles.container}>
         <Section text="Fill transaction">
           <TextInput
             ref={addressRef}
+            value={address}
             right={
               <TextInput.Icon
                 icon="clipboard"
-                onPress={() => {
+                onPress={() =>
                   Clipboard.getString().then((text) => {
-                    if (text) {
-                      setAddress(text);
-                      addressRef.current?.setNativeProps({
-                        text,
-                      });
-                    }
-                  });
-                }}
+                    if (text) setAddress(text);
+                  })
+                }
               />
             }
             mode="outlined"
             onChangeText={(v) => setAddress(v)}
             label={"Address"}
           />
+          {error.has("address") && (
+            <Text variant="labelMedium" style={styles.error}>
+              {error.get("address")}
+            </Text>
+          )}
+          {/* ---------------------------- */}
           <TextInput
             mode="outlined"
+            value={amount}
+            right={
+              <TextInput.Affix
+                text={`${
+                  Number(amount) / Math.pow(10, AccountBTC.decimals)
+                } btc`}
+              />
+            }
             keyboardType="decimal-pad"
+            maxLength={14}
             onChangeText={(v) => setAmount(v)}
             label={"Amount (satoshi)"}
           />
-          <Text variant="labelMedium">
-            {`${Number(amount)} satoshi = ${
-              Number(amount) / Math.pow(10, AccountBTC.decimals)
-            } btc`}
-          </Text>
+          <View
+            style={{
+              alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text variant="labelMedium">{info.get("spendable")}</Text>
+            {hasAnySpendable && (
+              <TouchableOpacity
+                onPress={() => {
+                  if (!wallet?.type) return;
+                  const all = SizeBTC.calcSendAllAmount(
+                    wallet?.type,
+                    selectedUtxos,
+                    Number(feeRate),
+                    opReturnData
+                  );
+                  setAmount(all.toString());
+                }}
+              >
+                <Text variant="labelMedium" style={{ color: theme.colors.primary }}>
+                  Send all
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          {info.get("amount") && (
+            <View style={styles.info}>
+              <Text variant="labelMedium" style={[styles.infoText, styles.textCenter]}>
+                {info.get("amount")}
+              </Text>
+            </View>
+          )}
+          {error.has("amount") && (
+            <Text variant="labelMedium" style={styles.error}>
+              {error.get("amount")}
+            </Text>
+          )}
+          {/* ---------------------------- */}
           <TextInput
             mode="outlined"
+            value={feeRate}
             keyboardType="decimal-pad"
+            maxLength={8}
             onChangeText={(v) => setFeeRate(v)}
             label={"Fee rate (sats/vB)"}
           />
-          <Text variant="labelMedium">
-            2 sats/vB is usually enough for testnet to include tx into first
+          <Text variant="labelMedium">{info.get("fee")}</Text>
+          {error.has("feeRate") && (
+            <Text variant="labelMedium" style={styles.error}>
+              {error.get("feeRate")}
+            </Text>
+          )}
+          <Text variant="labelSmall" style={styles.label}>
+            1 sats/vB is usually enough for testnet to include tx into first
             block
           </Text>
-
+          {/* ---------------------------- */}
           {more && (
-            <View
+            <Animated.View
+              entering={FadeIn}
               style={{
                 gap: theme.sizes.s,
               }}
@@ -143,54 +228,86 @@ export default function TransactionScreen() {
                 <Text variant="labelLarge">Replace by fee</Text>
                 <Switch value={rbf} onValueChange={(e) => setRbf(e)} />
               </View>
+              {/* ---------------------------- */}
               <TextInput
                 mode="outlined"
+                value={opReturnData}
                 keyboardType="decimal-pad"
                 onChangeText={(v) => setOpReturnData(v)}
                 label={"OP_RETURN data"}
               />
-              <Text variant="labelMedium">
+              <Text variant="labelSmall" style={styles.label}>
                 80 bytes of data that will be stored in the chain as unspendable
                 transaction
               </Text>
-            </View>
+              {error.has("opReturnData") && (
+                <Text variant="labelMedium" style={styles.error}>
+                  {error.get("opReturnData")}
+                </Text>
+              )}
+            </Animated.View>
           )}
           <View style={{ alignItems: "flex-end" }}>
-            {more ? (
-              <Button onPress={() => setMore(false)}>Less</Button>
-            ) : (
-              <Button onPress={() => setMore(true)}>More</Button>
-            )}
+            <Button onPress={() => setMore(!more)}>
+              {more ? "Less" : "More"}
+            </Button>
           </View>
         </Section>
-
-        <Section text="Those are your UTXOS that are going to be used to make this transaction">
+        {/* ---------------------------- */}
+        <Section text="Select UTXOs">
           {isLoading ? (
             <ActivityIndicator />
           ) : (
-            <View style={styles.utxosContainer}>
-              {noUtxos && (
-                <Text variant="bodyMedium">No utxos to spent :(</Text>
-              )}
-              {utxos?.map((utxo) => (
-                <UtxoCard key={utxo.tx_id} utxo={utxo} small selected />
-              ))}
+            <View>
+              <FlatList
+                ListHeaderComponent={() => (
+                  <View>
+                    <Text variant="labelMedium">{info.get("utxos")}</Text>
+                    <Text variant="labelMedium">{info.get("size")}</Text>
+                    <Text variant="labelMedium">{info.get("fee")}</Text>
+                    <Text variant="labelMedium">{info.get("spendable")}</Text>
+                    <Text variant="labelMedium">{info.get("exchange")}</Text>
+                  </View>
+                )}
+                ListEmptyComponent={() => (
+                  <Text variant="bodyMedium">No mined UTXOs to spent. :(</Text>
+                )}
+                data={spendableUtxos}
+                columnWrapperStyle={{ gap: theme.sizes.m }}
+                contentContainerStyle={{ gap: theme.sizes.m }}
+                keyExtractor={(item) => item.tx_id}
+                numColumns={2}
+                scrollEnabled={false}
+                renderItem={({ item }) => (
+                  <UtxoCard
+                    key={item.tx_id}
+                    utxo={item}
+                    small
+                    selected={selectedUtxos.includes(item)}
+                    hideSpent
+                    onPress={() => onSelectUtxo(item)}
+                  />
+                )}
+              />
+              {/* ---------------------------- */}
+              {!!pendingUtxos?.length && <View style={styles.separator} />}
+              <FlatList
+                data={pendingUtxos}
+                columnWrapperStyle={{ gap: theme.sizes.m }}
+                contentContainerStyle={{ gap: theme.sizes.m }}
+                keyExtractor={(item) => item.tx_id}
+                numColumns={2}
+                scrollEnabled={false}
+                renderItem={({ item }) => (
+                  <UtxoCard key={item.tx_id} utxo={item} small hideSpent />
+                )}
+              />
             </View>
           )}
         </Section>
-        <View>
-          {Object.values(errors).map((v) => (
-            <Text style={styles.error}>{`• ${v}`}</Text>
-          ))}
-        </View>
         <Button
           disabled={disabled}
-          onPress={() => {
-            navigate(
-              // @ts-ignore
-              `/(tabs)/wallet/${params.id}/(tabs)/transaction/submit?address=${address}&amount=${amount}&feeRate=${feeRate}&rbf=${rbf}&opReturnData=${opReturnData}`
-            );
-          }}
+          onPress={onCreateTransaction}
           mode="contained-tonal"
         >
           Create and sign transaction
@@ -209,16 +326,33 @@ const stylesBuilder = (theme: AppTheme) =>
       padding: theme.sizes.m,
       gap: theme.sizes.m,
     },
-    utxosContainer: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      justifyContent: "space-between",
-    },
     error: {
       color: theme.colors.error,
     },
     title: {
       color: theme.colors.onSurfaceVariant,
       marginVertical: theme.sizes.s,
+    },
+    label: {
+      color: theme.colors.onSurfaceVariant,
+    },
+    textCenter: {
+      textAlign: "center",
+    },
+    separator: {
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: theme.colors.backdrop,
+      marginVertical: theme.sizes.m,
+    },
+    info: {
+      backgroundColor: theme.colors.warning,
+      opacity: 0.8,
+      padding: theme.sizes.s,
+      borderRadius: theme.sizes.s,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: theme.colors.outline,
+    },
+    infoText: {
+      color: theme.colors.onTertiaryContainer,
     },
   });

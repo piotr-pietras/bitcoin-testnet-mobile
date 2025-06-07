@@ -20,11 +20,12 @@ export const WalletCard = ({ wallet, onWalletRemoved }: Props) => {
   const removeModal = useRef<null | ModalRef>(null);
   const theme = useTheme();
   const styles = stylesBuilder(theme);
-  const { push } = useRouter();
-
+  const { navigate } = useRouter();
   const onPress = () => {
-    //@ts-ignore
-    push(`/(tabs)/wallet/${wallet.id}/(tabs)/`);
+    navigate({
+      pathname: "/wallet/[id]/(tabs)/" as any,
+      params: { id: wallet.id },
+    });
   };
 
   const onRemove = () => {
@@ -34,19 +35,18 @@ export const WalletCard = ({ wallet, onWalletRemoved }: Props) => {
     });
   };
 
+  const copyToClipboard = () => {
+    Clipboard.setString(wallet.address);
+    Toast.show({ type: "success", text1: "Wallet address has been copied" });
+  };
+
   const blockie = useMemo(() => {
     return makeBlockie(wallet.address);
   }, [wallet.address]);
 
   return (
-    <>
-      <Card
-        // onLongPress={() =>
-        //   // removeWallet(wallet.id).then(() => onWalletRemoved?.())
-        // }
-        onPress={onPress}
-        style={styles.container}
-      >
+    <View>
+      <Card onPress={onPress} style={styles.container}>
         <View style={styles.titleContainer}>
           <View style={styles.titleLeftContainer}>
             <Image source={{ uri: blockie }} style={styles.blockie} />
@@ -57,7 +57,6 @@ export const WalletCard = ({ wallet, onWalletRemoved }: Props) => {
             >
               {wallet.name}
             </Text>
-            
           </View>
           <TouchableOpacity onPress={() => removeModal.current?.open()}>
             <Ionicons
@@ -96,10 +95,7 @@ export const WalletCard = ({ wallet, onWalletRemoved }: Props) => {
           <IconButton
             style={styles.iconButton}
             mode="outlined"
-            onPress={() => {
-              Clipboard.setString(wallet.address);
-              Toast.show({ type: "success", text1: "Address has been copied" });
-            }}
+            onPress={copyToClipboard}
             icon={() => (
               <Ionicons
                 name={"clipboard"}
@@ -124,7 +120,7 @@ export const WalletCard = ({ wallet, onWalletRemoved }: Props) => {
           </Button>
         </View>
       </Modal>
-    </>
+    </View>
   );
 };
 

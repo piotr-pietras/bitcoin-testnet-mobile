@@ -9,11 +9,12 @@ export default function Layout() {
   return (
     <Stack
       screenOptions={{
-        title: "Submit transaction",
+        title: "Faucats",
         animation: "slide_from_right",
         contentStyle: { backgroundColor: colors.background, paddingTop: top },
         headerStyle: { backgroundColor: colors.surface },
         headerTintColor: colors.onSurface,
+        
       }}
     >
       <Stack.Screen
@@ -22,8 +23,12 @@ export default function Layout() {
           headerShown: false,
         }}
       />
-      <Stack.Screen name="submit" options={{ title: "Submit" }} />
-      <Stack.Screen name="[txId]/index" options={{ title: "Transaction" }} />
+      <Stack.Screen
+        name="[faucat]"
+        options={{
+          headerShown: true,
+        }}
+      />
     </Stack>
   );
 }

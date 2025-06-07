@@ -1,5 +1,5 @@
 import TransactionScreen from "@/components/TranscationScreen";
 
-export default function UtxoTransactionScreen() {
+export default function SubmittedTransactionScreen() {
   return <TransactionScreen />;
 }

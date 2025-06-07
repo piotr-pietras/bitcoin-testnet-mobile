@@ -23,8 +23,8 @@ export const ButtonSection = ({ buttons }: Props) => {
     <View style={styles.buttonSection}>
       {buttons.map(({ iconName, text, onPress, right }, i) => {
         return (
-          <Animated.View entering={FadeIn.delay(100 * i)}>
-            <TouchableOpacity key={i} onPress={onPress}>
+          <Animated.View key={i} entering={FadeIn.delay(100 * i)}>
+            <TouchableOpacity  onPress={onPress}>
               <View style={styles.buttonContainer}>
                 <View style={styles.leftContainer}>
                   <Ionicons

@@ -4,10 +4,7 @@ import { AppTheme, useTheme } from "@/services/theme";
 import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Button, RadioButton, Text, TextInput } from "react-native-paper";
-import Animated, {
-  useAnimatedKeyboard,
-  useAnimatedStyle,
-} from "react-native-reanimated";
+import Animated, { useAnimatedKeyboard } from "react-native-reanimated";
 
 export default function Step1Screen() {
   const theme = useTheme();
@@ -31,7 +28,7 @@ export default function Step1Screen() {
                 status={nw?.net === "TEST" ? "checked" : "unchecked"}
               />
             </View>
-            <Text>Testnet3</Text>
+            <Text variant="labelLarge">Testnet3</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => nw?.setNet("TEST4")}
@@ -43,7 +40,7 @@ export default function Step1Screen() {
                 status={nw?.net === "TEST4" ? "checked" : "unchecked"}
               />
             </View>
-            <Text>Testnet4</Text>
+            <Text variant="labelLarge">Testnet4</Text>
           </TouchableOpacity>
         </Section>
 
@@ -58,7 +55,10 @@ export default function Step1Screen() {
                 status={nw?.type === "p2pkh" ? "checked" : "unchecked"}
               />
             </View>
-            <Text>p2pkh</Text>
+            <Text variant="labelLarge" >p2pkh</Text>
+            <Text variant="labelLarge" style={styles.label}>
+              (legacy)
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => nw?.setType("p2wpkh")}
@@ -115,6 +115,10 @@ const stylesBuilder = (theme: AppTheme) =>
     radio: {
       flexDirection: "row",
       alignItems: "center",
+      gap: theme.sizes.s,
+    },
+    label: {
+      color: theme.colors.onSurfaceVariant,
     },
     buttonContainer: {
       flexDirection: "row",

@@ -1,8 +1,9 @@
 import { queryClient } from "@/services/tanstack";
-import { TransactionBTC } from "@/services/TransactionBTC";
+import { TransactionBTC } from "@/services/btc/TransactionBTC";
 import { useMutation } from "@tanstack/react-query";
 
 export const useSubmitTx = (
+  walletId: string,
   transaction: TransactionBTC | null,
   onError?: (error: Error) => void
 ) => {
@@ -10,7 +11,9 @@ export const useSubmitTx = (
     mutationFn: async () => await transaction?.send(),
     onError,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["utxos"] });
+      setTimeout(async () => {
+        await queryClient.refetchQueries({ queryKey: ["utxos", walletId] });
+      }, 3000);
     },
   });
 };

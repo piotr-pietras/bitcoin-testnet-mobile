@@ -1,44 +1,75 @@
-import { Card, Chip, Text } from "react-native-paper";
-import { StyleSheet, View } from "react-native";
+import { ActivityIndicator, Card, Chip, Text } from "react-native-paper";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { UTXO } from "@/types/global";
 import { AppTheme, useTheme } from "@/services/theme";
-import { AccountBTC } from "@/services/AccountBTC";
+import { AccountBTC } from "@/services/btc/AccountBTC";
 import { Ionicons } from "@expo/vector-icons";
 
 type Props = {
   utxo: UTXO;
   small?: boolean;
   selected?: boolean;
+  hideSpent?: boolean;
+  onPress?: (txId: string) => void;
 };
 
-export const UtxoCard = ({ utxo, small, selected }: Props) => {
+export const UtxoCard = ({
+  utxo,
+  small,
+  selected,
+  hideSpent,
+  onPress,
+}: Props) => {
   const theme = useTheme();
   const styles = stylesBuilder(theme);
 
   return (
-    <>
+    <TouchableOpacity style={{ flex: 1 }} onPress={() => onPress?.(utxo.tx_id)}>
       <Card
         style={[
           styles.container,
-          selected ? styles.selectedContainer : undefined,
-          small ? styles.smallContainer : undefined,
+          selected ? styles.selectedContainer : styles.unselectedContainer,
         ]}
       >
         <View style={styles.chipContainer}>
-          <Chip
-            style={{
-              backgroundColor:
-                utxo.status === "mined"
-                  ? theme.colors.success
-                  : theme.colors.tertiary,
-            }}
-          >
-            {utxo.status}
-          </Chip>
-          {selected && (
+          <View style={styles.chipContainerRight}>
+            {utxo.status === "pending" && (
+              <ActivityIndicator size={theme.sizes.m} />
+            )}
+
+            <Chip
+              style={{
+                backgroundColor:
+                  utxo.status === "mined"
+                    ? theme.colors.success
+                    : theme.colors.warning,
+              }}
+            >
+              {utxo.status}
+            </Chip>
+            {!hideSpent && (
+              <Chip
+                style={{
+                  backgroundColor: utxo.is_spent
+                    ? theme.colors.error
+                    : theme.colors.success,
+                }}
+              >
+                {utxo.is_spent ? "spent" : "unspent"}
+              </Chip>
+            )}
+          </View>
+          {selected === true && (
             <Ionicons
               name="checkbox"
               color={theme.colors.success}
+              size={theme.sizes.l}
+            />
+          )}
+          {selected === false && (
+            <Ionicons
+              name="square-outline"
+              color={theme.colors.backdrop}
               size={theme.sizes.l}
             />
           )}
@@ -91,7 +122,7 @@ export const UtxoCard = ({ utxo, small, selected }: Props) => {
           </View>
         )}
       </Card>
-    </>
+    </TouchableOpacity>
   );
 };
 
@@ -105,14 +136,18 @@ const stylesBuilder = (theme: AppTheme) =>
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: theme.colors.success,
     },
-    smallContainer: {
-      width: "48.5%",
-      marginBottom: "2.5%",
+    unselectedContainer: {
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: theme.colors.backdrop,
     },
     chipContainer: {
       flexDirection: "row",
       justifyContent: "space-between",
       marginBottom: theme.sizes.m,
+    },
+    chipContainerRight: {
+      flexDirection: "row",
+      gap: theme.sizes.s,
     },
     section: {
       flexDirection: "row",

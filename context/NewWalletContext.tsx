@@ -1,4 +1,4 @@
-import { sha256 } from "@noble/hashes/sha256";
+import { sha256 } from "@noble/hashes/sha2.js";
 import { useRouter } from "expo-router";
 import {
   createContext,
@@ -8,14 +8,14 @@ import {
   useContext,
   useState,
 } from "react";
-import { AccountBTC } from "@/services/AccountBTC";
+import { AccountBTC } from "@/services/btc/AccountBTC";
 import { saveWallet } from "@/services/storage";
 import { Net } from "@/types/global";
 
 type ContextValues =
   | {
       startNewWallet: () => void;
-      generateNewWallet: () => void;
+      generateNewWallet: () => Promise<void>;
       nextStep: () => void;
       previousStep: () => void;
       step: number;
@@ -37,7 +37,7 @@ export const NewWalletContext = (props: PropsWithChildren) => {
   const [step, setStep] = useState(1);
   const { replace } = useRouter();
   const [net, setNet] = useState<Net>("TEST");
-  const [type, setType] = useState<"p2pkh" | "p2wpkh">("p2pkh");
+  const [type, setType] = useState<"p2pkh" | "p2wpkh">("p2wpkh");
   const [phrase, setPhrase] = useState("");
   const [name, setName] = useState("");
 
@@ -57,7 +57,7 @@ export const NewWalletContext = (props: PropsWithChildren) => {
   const generateNewWallet = () => {
     const privKey = sha256(phrase);
     const account = new AccountBTC(privKey, net, type);
-    saveWallet(privKey, account.address, type, net, name);
+    return saveWallet(privKey, account.address, type, net, name);
   };
 
   const allowGenerate = !!phrase;

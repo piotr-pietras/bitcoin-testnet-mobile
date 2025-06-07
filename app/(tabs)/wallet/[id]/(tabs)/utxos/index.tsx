@@ -1,28 +1,58 @@
 import { UtxoCard } from "@/components/UtxoCard";
 import { useGetUtxos } from "@/hooks/useGetUtxos";
+import { getWallet } from "@/services/storage";
 import { AppTheme, useTheme } from "@/services/theme";
-import { useGlobalSearchParams } from "expo-router";
-import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
+import { useGlobalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
+import {
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  View,
+} from "react-native";
 import { Text } from "react-native-paper";
 
 export default function UtxosScreen() {
   const theme = useTheme();
+  const { push } = useRouter();
   const params = useGlobalSearchParams<{ id: string }>();
   const styles = stylesBuilder(theme);
   const { data, isLoading, refetch } = useGetUtxos(params.id, true);
+  const [showSpent, setShowSpent] = useState(false);
+
+  const filteredUtxos = data?.filter((utxo) => {
+    if (showSpent) return true;
+    return !utxo.is_spent;
+  });
 
   return (
     <View style={styles.container}>
+      <View style={styles.switchContainer}>
+        <Text>Show spent</Text>
+        <Switch
+          value={showSpent}
+          onValueChange={() => setShowSpent(!showSpent)}
+        />
+      </View>
       <ScrollView
         refreshControl={
           <RefreshControl onRefresh={() => refetch()} refreshing={isLoading} />
         }
       >
         <View style={styles.contentContainer}>
-          {data?.map((utxo) => (
-            <UtxoCard key={utxo.tx_id} utxo={utxo} />
+          {filteredUtxos?.map((utxo) => (
+            <UtxoCard
+              key={utxo.tx_id}
+              utxo={utxo}
+              onPress={() => {
+                getWallet(params.id).then((wallet) => {
+                  push(`/wallet/${params.id}/utxos/${utxo.tx_id}?net=${wallet.net}`);
+                });
+              }}
+            />
           ))}
-          {data?.length === 0 && (
+          {filteredUtxos?.length === 0 && (
             <>
               <Text style={styles.label}>
                 It seems like you don't have any utxos to spent.
@@ -48,6 +78,13 @@ const stylesBuilder = (theme: AppTheme) =>
       flex: 1,
       padding: theme.sizes.m,
       gap: theme.sizes.m,
+    },
+    switchContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      gap: theme.sizes.s,
+      marginTop: theme.sizes.m,
     },
     container: {
       flex: 1,

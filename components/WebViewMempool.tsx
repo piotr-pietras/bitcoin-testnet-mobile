@@ -4,6 +4,7 @@ import { StyleSheet, View } from "react-native";
 import { AppTheme, useTheme } from "@/services/theme";
 import { IconButton } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
+import Animated from "react-native-reanimated";
 
 type Props = {
   uri: string;

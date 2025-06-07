@@ -15,5 +15,19 @@ export type UTXO = {
   value: number;
   confirmations: number;
   status: "mined" | "spent" | "pending";
+  is_spent: boolean;
   script?: string;
 };
+
+export const Faucats: { [keys in Net]: { [keys in string]: string } } = {
+  TEST4: {
+    "faucet.testnet4.dev": "https://faucet.testnet4.dev/",
+    "coinfaucet.eu": "https://coinfaucet.eu/en/btc-testnet4/",
+  },
+  TEST: {
+    "coinfaucet.eu": "https://coinfaucet.eu/en/btc-testnet/",
+    // "faucet.triangleplatform.com":
+    //   "https://faucet.triangleplatform.com/bitcoin/testnet",
+    // "tbtc.bitaps.com": "https://tbtc.bitaps.com/",
+  },
+} as const;

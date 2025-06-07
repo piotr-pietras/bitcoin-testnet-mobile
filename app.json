@@ -2,9 +2,10 @@
   "expo": {
     "name": "Testnet",
     "slug": "bitcoin-testnet",
-    "version": "0.0.5",
+    "version": "0.0.7",
     "orientation": "portrait",
     "scheme": "myapp",
+    "newArchEnabled": false,
     "userInterfaceStyle": "automatic",
     "backgroundColor": "#1D1F31",
     "androidNavigationBar": {
@@ -20,6 +21,7 @@
       "supportsTablet": true
     },
     "android": {
+      "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -33,7 +35,9 @@
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-font",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

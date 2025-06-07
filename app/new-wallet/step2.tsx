@@ -12,8 +12,9 @@ export default function Step2Screen() {
   const { dismiss } = useRouter();
 
   const onGenerate = () => {
-    nw?.generateNewWallet();
-    dismiss();
+    nw?.generateNewWallet().then(() => {
+      dismiss();
+    });
   };
 
   return (

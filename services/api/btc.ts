@@ -38,10 +38,10 @@ export type GetUtxos = {
 };
 
 export const btcApi = {
-  async getUtxos(address: string, net: Net, all?: boolean): Promise<GetUtxos> {
+  async getUtxos(address: string, net: Net, mempool: boolean): Promise<GetUtxos> {
     const client = await universalBtcApiClient(net);
     const res = await client.get(
-      `/account/${address}/utxo${all ? "?check_mempool=true" : ""}`
+      `/account/${address}/utxo${mempool ? "?check_mempool=true" : ""}`
     );
     return res.data;
   },

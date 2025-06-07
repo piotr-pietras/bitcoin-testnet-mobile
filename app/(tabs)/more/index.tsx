@@ -1,4 +1,4 @@
-import { ButtonSection } from "@/components/ButtonSecton";
+import { ButtonSection } from "@/components/ButtonSection";
 import { AppTheme, useTheme } from "@/services/theme";
 import { StyleSheet, View } from "react-native";
 import * as WebBrowser from "expo-web-browser";
@@ -11,29 +11,33 @@ export default function MoreScreen() {
   const { navigate } = useRouter();
 
   return (
-    <View style={styles.container}>
-      <ButtonSection
-        buttons={[
-          {
-            text: "Faucats",
-            iconName: "water",
-            onPress() {
-              navigate("/(tabs)/more/faucats");
+    <>
+      <View style={styles.container}>
+        <ButtonSection
+          buttons={[
+            // {
+            //   text: "Faucats",
+            //   iconName: "water",
+            //   onPress() {
+            //     navigate("/(tabs)/more/faucats");
+            //   },
+            // },
+            {
+              text: "Source code",
+              iconName: "logo-github",
+              onPress() {
+                WebBrowser.openBrowserAsync(
+                  "https://github.com/piotr-pietras/bitcoin-testnet-mobile"
+                );
+              },
             },
-          },
-          {
-            text: "Source code",
-            iconName: "logo-github",
-            onPress() {
-              WebBrowser.openBrowserAsync(
-                "https://github.com/piotr-pietras/bitcoin-testnet-mobile"
-              );
-            },
-          },
-        ]}
-      />
-      <Text style={styles.label}>Powered by Mempool, Blockdaemon, bitcoin-js</Text>
-    </View>
+          ]}
+        />
+        <Text style={styles.label}>
+          Powered by Mempool, Blockdaemon, bitcoin-js
+        </Text>
+      </View>
+    </>
   );
 }
 

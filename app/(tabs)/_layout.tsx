@@ -1,30 +1,34 @@
 import React from "react";
 import { Tabs } from "expo-router";
 import { Text } from "react-native-paper";
-import { theme, useTheme } from "@/services/theme";
+import { useTheme } from "@/services/theme";
 import { Ionicons } from "@expo/vector-icons";
 import * as Device from "expo-device";
-
-export const MAIN_TABBAR_HEIGHT = theme.sizes.xxl;
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
-  const { colors } = useTheme();
+  const { colors, sizes } = useTheme();
+  const { bottom, top } = useSafeAreaInsets();
 
   return (
     <Tabs
       screenOptions={{
-        headerStyle: { backgroundColor: colors.surface },
-        headerTitleStyle: { color: colors.onSurface },
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          height: MAIN_TABBAR_HEIGHT,
           backgroundColor: colors.surface,
+          height: bottom + sizes.xxl,
         },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
+          sceneStyle: {
+            paddingTop: top,
+            backgroundColor: colors.background,
+          },
           title: "Wallets",
+          headerShown: false,
           freezeOnBlur: true,
           tabBarLabel: ({ focused }) => {
             if (Device.deviceType === Device.DeviceType.TABLET) return;
@@ -77,7 +81,6 @@ export default function TabLayout() {
         options={{
           href: null,
           headerShown: false,
-          unmountOnBlur: true,
         }}
       />
     </Tabs>

@@ -9,9 +9,9 @@ export default function Layout() {
   return (
     <Stack
       screenOptions={{
-        title: "Submit transaction",
-        animation: "slide_from_right",
-        contentStyle: { backgroundColor: colors.background, paddingTop: top },
+        title: "UTXOs",
+        animation: "fade",
+        contentStyle: { backgroundColor: colors.background },
         headerStyle: { backgroundColor: colors.surface },
         headerTintColor: colors.onSurface,
       }}
@@ -19,11 +19,12 @@ export default function Layout() {
       <Stack.Screen
         name="index"
         options={{
+          title: "UTXOs",
           headerShown: false,
+          contentStyle: { backgroundColor: colors.background, paddingTop: top },
         }}
       />
-      <Stack.Screen name="submit" options={{ title: "Submit" }} />
-      <Stack.Screen name="[txId]/index" options={{ title: "Transaction" }} />
+      <Stack.Screen name="[txId]/index" options={{ title: "UTXO" }} />
     </Stack>
   );
 }
