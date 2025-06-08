@@ -27,6 +27,17 @@ export default function FaucatsScreen() {
     <View style={styles.container}>
       <WebView
         ref={webview}
+        injectedJavaScript={`
+          function hideNavbar() {
+            let elements = document.getElementsByClassName("navbar");
+            for (let i = 0; i < elements.length; i++) {
+              elements[i].style.display = "none";
+            }
+          };
+          
+          hideNavbar();
+        `}
+        scalesPageToFit={false}
         source={{
           uri: Faucats[wallet?.net as Net][params.faucat],
         }}

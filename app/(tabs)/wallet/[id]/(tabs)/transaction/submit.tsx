@@ -41,7 +41,7 @@ export default function SubmitScreen() {
     }
   });
 
-  const { data, isSuccess, status } = useGetUtxos(params.id);
+  const { data, isSuccess, status } = useGetUtxos(params.id, true, false);
 
   useEffect(() => {
     const init = async (utxos: UTXO[]) => {

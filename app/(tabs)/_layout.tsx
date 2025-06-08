@@ -29,7 +29,6 @@ export default function TabLayout() {
           },
           title: "Wallets",
           headerShown: false,
-          freezeOnBlur: true,
           tabBarLabel: ({ focused }) => {
             if (Device.deviceType === Device.DeviceType.TABLET) return;
             return (

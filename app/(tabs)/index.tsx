@@ -1,16 +1,14 @@
+import IconButton from "@/components/IconButton";
 import { WalletCard } from "@/components/WalletCard";
 import { useNewWalletContext } from "@/context/NewWalletContext";
-import {
-  getWallets,
-  WalletStoredInfo,
-} from "@/services/storage";
+import { getWallets, WalletStoredInfo } from "@/services/storage";
 import { AppTheme, useTheme } from "@/services/theme";
 import { Net } from "@/types/global";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import {  IconButton, SegmentedButtons, Text } from "react-native-paper";
+import { SegmentedButtons, Text } from "react-native-paper";
 import Animated, {
   FadeIn,
   LinearTransition,

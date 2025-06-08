@@ -114,6 +114,9 @@ interface Props {
 
 export const useValidateTxStates = (props: Props) => {
   const [transaction, setTransaction] = useState<TransactionBTC | null>(null);
+  const [timeoutId, setTimeoutId] = useState<number | null>(
+    null
+  );
   const [error, setError] = useState<Map<keyof ValidatedSectionKeys, string>>(
     new Map()
   );
@@ -121,16 +124,19 @@ export const useValidateTxStates = (props: Props) => {
     new Map()
   );
 
-  // TODO: add debounce
   useEffect(() => {
     if (!props.wallet) return;
-    validateStates({ ...props, wallet: props.wallet }).then(
-      ({ error, info, transaction }) => {
-        setError(error);
-        setInfo(info);
-        setTransaction(transaction);
-      }
-    );
+    if (timeoutId) clearTimeout(timeoutId);
+    const id = setTimeout(() => {
+      validateStates({ ...props, wallet: props.wallet! }).then(
+        ({ error, info, transaction }) => {
+          setError(error);
+          setInfo(info);
+          setTransaction(transaction);
+        }
+      );
+    }, 250);
+    setTimeoutId(id);
   }, [
     props.wallet,
     props.address,

@@ -4,7 +4,7 @@ import { UTXO } from "@/types/global";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
-export const useGetUtxos = (id: string, mempool?: boolean) => {
+export const useGetUtxos = (id: string, mempool?: boolean, spent?: boolean) => {
   const [wallet, setWallet] = useState<WalletStoredInfo | undefined>(undefined);
 
   useEffect(() => {
@@ -15,10 +15,10 @@ export const useGetUtxos = (id: string, mempool?: boolean) => {
 
   return useQuery({
     enabled: !!wallet,
-    queryKey: ["utxos", wallet?.id, (!!mempool).toString()],
+    queryKey: ["utxos", wallet?.id, `${!!mempool}-${!!spent}`],
     staleTime: 10000,
     queryFn: async () =>
-      await btcApi.getUtxos(wallet!.address, wallet!.net, !!mempool),
+      await btcApi.getUtxos(wallet!.address, wallet!.net, !!mempool, !!spent),
     select,
   });
 };

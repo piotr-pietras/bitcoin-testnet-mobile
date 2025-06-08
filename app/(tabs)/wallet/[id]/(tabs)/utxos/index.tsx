@@ -18,8 +18,8 @@ export default function UtxosScreen() {
   const { push } = useRouter();
   const params = useGlobalSearchParams<{ id: string }>();
   const styles = stylesBuilder(theme);
-  const { data, isLoading, refetch } = useGetUtxos(params.id, true);
   const [showSpent, setShowSpent] = useState(false);
+  const { data, isLoading, refetch } = useGetUtxos(params.id, true, showSpent);
 
   const filteredUtxos = data?.filter((utxo) => {
     if (showSpent) return true;
@@ -53,18 +53,18 @@ export default function UtxosScreen() {
             />
           ))}
           {filteredUtxos?.length === 0 && (
-            <>
-              <Text style={styles.label}>
-                It seems like you don't have any utxos to spent.
+            <View>
+              <Text variant="labelMedium" style={[styles.label, styles.textCenter]}>
+                It seems like you don't have any UTXOs to spent.
               </Text>
-              <Text style={styles.label}>
-                If you recently send a transaction probably your utxo is in
+              <Text variant="labelMedium" style={[styles.label, styles.textCenter]}>
+                If you recently send a transaction probably your UTXO is in
                 mempool waiting to be included into a block.
               </Text>
-              <Text style={styles.label}>
+              <Text variant="labelMedium" style={[styles.label, styles.textCenter]}>
                 If you don't have any coins visit a faucat to receive some.
               </Text>
-            </>
+            </View>
           )}
         </View>
       </ScrollView>
@@ -93,5 +93,8 @@ const stylesBuilder = (theme: AppTheme) =>
     label: {
       color: theme.colors.onSurfaceVariant,
       marginBottom: theme.sizes.s,
+    },
+    textCenter: {
+      textAlign: "center",
     },
   });

@@ -1,4 +1,4 @@
-import { Button, Card, IconButton, Text } from "react-native-paper";
+import { Button, Text } from "react-native-paper";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -10,6 +10,8 @@ import { useRouter } from "expo-router";
 import { useMemo, useRef } from "react";
 import { Modal, ModalRef } from "./Modal";
 import makeBlockie from "ethereum-blockies-base64";
+import IconButton from "./IconButton";
+import Card from "./Card";
 
 type Props = {
   wallet: WalletStoredInfo;
@@ -94,7 +96,6 @@ export const WalletCard = ({ wallet, onWalletRemoved }: Props) => {
           </Text>
           <IconButton
             style={styles.iconButton}
-            mode="outlined"
             onPress={copyToClipboard}
             icon={() => (
               <Ionicons

@@ -11,15 +11,20 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useFocusEffect, useGlobalSearchParams, useRouter } from "expo-router";
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo, useLayoutEffect } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { ActivityIndicator, Button, Text, TextInput } from "react-native-paper";
 import Clipboard from "@react-native-clipboard/clipboard";
-import Animated, { FadeIn, useAnimatedKeyboard } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  LinearTransition,
+  useAnimatedKeyboard,
+} from "react-native-reanimated";
 import { UTXO } from "@/types/global";
 import { getWallet, WalletStoredInfo } from "@/services/storage";
 import { useValidateTxStates } from "@/hooks/useValidateTxStates";
 import { SizeBTC } from "@/services/btc/SizeBTC";
+import { useUnmountOnBlur } from "@/hooks/useUnmountOnBlur";
 
 export default function TransactionScreen() {
   const theme = useTheme();
@@ -46,7 +51,7 @@ export default function TransactionScreen() {
   });
 
   const params = useGlobalSearchParams<{ id: string }>();
-  const { data: utxos, isLoading, refetch } = useGetUtxos(params.id, true);
+  const { data: utxos, isLoading, refetch } = useGetUtxos(params.id, true, false);
   const spendableUtxos = utxos?.filter(
     (utxo) => !utxo.is_spent && utxo.status === "mined"
   );
@@ -176,7 +181,10 @@ export default function TransactionScreen() {
                   setAmount(all.toString());
                 }}
               >
-                <Text variant="labelMedium" style={{ color: theme.colors.primary }}>
+                <Text
+                  variant="labelMedium"
+                  style={{ color: theme.colors.primary }}
+                >
                   Send all
                 </Text>
               </TouchableOpacity>
@@ -184,7 +192,10 @@ export default function TransactionScreen() {
           </View>
           {info.get("amount") && (
             <View style={styles.info}>
-              <Text variant="labelMedium" style={[styles.infoText, styles.textCenter]}>
+              <Text
+                variant="labelMedium"
+                style={[styles.infoText, styles.textCenter]}
+              >
                 {info.get("amount")}
               </Text>
             </View>
@@ -259,7 +270,7 @@ export default function TransactionScreen() {
             <ActivityIndicator />
           ) : (
             <View>
-              <FlatList
+              <Animated.FlatList
                 ListHeaderComponent={() => (
                   <View>
                     <Text variant="labelMedium">{info.get("utxos")}</Text>
@@ -270,7 +281,9 @@ export default function TransactionScreen() {
                   </View>
                 )}
                 ListEmptyComponent={() => (
-                  <Text variant="bodyMedium">No mined UTXOs to spent. :(</Text>
+                  <Text variant="bodyMedium" style={[styles.label, styles.textCenter]}>
+                    No mined UTXOs to spent
+                  </Text>
                 )}
                 data={spendableUtxos}
                 columnWrapperStyle={{ gap: theme.sizes.m }}
@@ -291,7 +304,7 @@ export default function TransactionScreen() {
               />
               {/* ---------------------------- */}
               {!!pendingUtxos?.length && <View style={styles.separator} />}
-              <FlatList
+              <Animated.FlatList
                 data={pendingUtxos}
                 columnWrapperStyle={{ gap: theme.sizes.m }}
                 contentContainerStyle={{ gap: theme.sizes.m }}

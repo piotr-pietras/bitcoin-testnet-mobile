@@ -2,9 +2,8 @@ import { useRef } from "react";
 import WebView from "react-native-webview";
 import { StyleSheet, View } from "react-native";
 import { AppTheme, useTheme } from "@/services/theme";
-import { IconButton } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
-import Animated from "react-native-reanimated";
+import IconButton from "./IconButton";
 
 type Props = {
   uri: string;
@@ -18,6 +17,7 @@ export const WebViewMempool = ({ uri }: Props) => {
   return (
     <View style={styles.container}>
       <IconButton
+        rotate
         size={theme.sizes.l}
         style={styles.refresh}
         onPress={() => webview.current?.reload()}

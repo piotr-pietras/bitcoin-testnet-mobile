@@ -12,8 +12,8 @@ export const useSubmitTx = (
     onError,
     onSuccess: () => {
       setTimeout(async () => {
-        await queryClient.refetchQueries({ queryKey: ["utxos", walletId] });
-      }, 3000);
+        await queryClient.refetchQueries({ queryKey: ["utxos", walletId, "true-false"] });
+      }, 5000);
     },
   });
 };
