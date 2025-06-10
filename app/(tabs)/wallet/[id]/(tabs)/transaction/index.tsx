@@ -4,7 +4,6 @@ import { useGetUtxos } from "@/hooks/useGetUtxos";
 import { AccountBTC } from "@/services/btc/AccountBTC";
 import { AppTheme, useTheme } from "@/services/theme";
 import {
-  FlatList,
   RefreshControl,
   TextInput as RNTextInput,
   Switch,
@@ -17,14 +16,12 @@ import { ActivityIndicator, Button, Text, TextInput } from "react-native-paper";
 import Clipboard from "@react-native-clipboard/clipboard";
 import Animated, {
   FadeIn,
-  LinearTransition,
   useAnimatedKeyboard,
 } from "react-native-reanimated";
 import { UTXO } from "@/types/global";
 import { getWallet, WalletStoredInfo } from "@/services/storage";
 import { useValidateTxStates } from "@/hooks/useValidateTxStates";
 import { SizeBTC } from "@/services/btc/SizeBTC";
-import { useUnmountOnBlur } from "@/hooks/useUnmountOnBlur";
 
 export default function TransactionScreen() {
   const theme = useTheme();
