@@ -5,6 +5,7 @@ import { AppTheme, useTheme } from "@/services/theme";
 import { AccountBTC } from "@/services/btc/AccountBTC";
 import { Ionicons } from "@expo/vector-icons";
 import Card from "./Card";
+import React from "react";
 
 type Props = {
   utxo: UTXO;
@@ -86,7 +87,7 @@ export const UtxoCard = ({
       </View>
       <View style={styles.section}>
         {!small && (
-          <View>
+          <>
             <Text style={styles.label} variant="bodyMedium" numberOfLines={1}>
               Value:
             </Text>
@@ -97,7 +98,7 @@ export const UtxoCard = ({
             >
               {`${utxo.value} satoshi`}
             </Text>
-          </View>
+          </>
         )}
         <Text style={styles.label} variant="bodyMedium" numberOfLines={1}>
           {`${utxo.value / Math.pow(10, AccountBTC.decimals)} btc`}

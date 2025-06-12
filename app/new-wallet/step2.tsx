@@ -16,11 +16,11 @@ export default function Step2Screen() {
   const styles = stylesBuilder(theme);
   const nw = useNewWalletContext();
   const keyboard = useAnimatedKeyboard();
-  const { dismiss } = useRouter();
+  const { replace } = useRouter();
 
   const onGenerate = () => {
     nw?.generateNewWallet().then(() => {
-      dismiss();
+      replace(`/(tabs)?testnet=${nw?.net}`);
     });
   };
 

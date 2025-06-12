@@ -6,6 +6,7 @@ import { getWallet, WalletStoredInfo } from "@/services/storage";
 import { Faucats } from "@/types/global";
 import { Net } from "@/types/global";
 import WebView from "react-native-webview";
+import { queryClient } from "@/services/tanstack";
 
 export default function FaucatsScreen() {
   const webview = useRef<WebView>(null);
@@ -20,6 +21,16 @@ export default function FaucatsScreen() {
       setWallet(wallet);
     });
   }, [params.id]);
+
+  useEffect(() => {
+    return () => {
+      setTimeout(async () => {
+        await queryClient.refetchQueries({
+          queryKey: ["utxos", params.id, "true-false"],
+        });
+      }, 5000);
+    };
+  }, []);
 
   if (!wallet) return null;
 

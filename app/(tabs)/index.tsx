@@ -5,7 +5,7 @@ import { getWallets, WalletStoredInfo } from "@/services/storage";
 import { AppTheme, useTheme } from "@/services/theme";
 import { Net } from "@/types/global";
 import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { SegmentedButtons, Text } from "react-native-paper";
@@ -20,6 +20,7 @@ export default function WalletsScreen() {
   const styles = stylesBuilder(theme);
   const { navigate } = useRouter();
   const nw = useNewWalletContext();
+  const { testnet } = useLocalSearchParams();
   const [wallets, setWallets] = useState<WalletStoredInfo[]>([]);
   const [net, setNet] = useState<Net>("TEST4");
   const filteredWallets = useMemo(
@@ -34,6 +35,14 @@ export default function WalletsScreen() {
   useEffect(() => {
     loadWallets();
   }, [net]);
+
+  useEffect(() => {
+    if (testnet === "TEST") {
+      setNet("TEST");
+    } else if (testnet === "TEST4") {
+      setNet("TEST4");
+    }
+  }, [testnet]);
 
   useFocusEffect(
     useCallback(() => {
@@ -63,6 +72,11 @@ export default function WalletsScreen() {
         data={filteredWallets}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={() => (
+          <View style={styles.emptyContainer}>
+            <Text variant="labelLarge" style={styles.label}>No wallets found</Text>
+          </View>
+        )}
         itemLayoutAnimation={LinearTransition}
         renderItem={({ item, index }) => (
           <Animated.View key={item.id} entering={SlideInDown.delay(50 * index)}>
@@ -91,7 +105,7 @@ export default function WalletsScreen() {
           )}
         />
       </Animated.View>
-      <Text style={styles.label}>
+      <Text style={styles.bottomLabel}>
         Powered by Mempool, Blockdaemon, bitcoin-js
       </Text>
     </View>
@@ -103,6 +117,11 @@ const stylesBuilder = (theme: AppTheme) =>
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
+    },
+    emptyContainer: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
     },
     segmentedButtons: {
       margin: theme.sizes.m,
@@ -124,6 +143,9 @@ const stylesBuilder = (theme: AppTheme) =>
       height: theme.sizes.xxl + theme.sizes.m,
     },
     label: {
+      color: theme.colors.onSurfaceVariant,
+    },
+    bottomLabel: {
       position: "absolute",
       width: "100%",
       bottom: 0,

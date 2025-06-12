@@ -36,21 +36,17 @@ export default function WalletsScreen() {
     });
   }, [wallet]);
 
-  const isMounted = useUnmountOnBlur();
-
   return (
     <>
-      {isMounted && (
-        <Animated.View entering={FadeIn.duration(1000)} style={styles.container}>
-          {wallet && (
-            <WebViewMempool
-              uri={`https://mempool.space/${
-                NetNamePath[wallet?.net || "TEST"]
-              }/address/${wallet?.address}`}
-            />
-          )}
-        </Animated.View>
-      )}
+      <View style={styles.container}>
+        {wallet && (
+          <WebViewMempool
+            uri={`https://mempool.space/${
+              NetNamePath[wallet?.net || "TEST"]
+            }/address/${wallet?.address}`}
+          />
+        )}
+      </View>
       <Modal ref={infoFaucatModal}>
         <Text variant="bodyLarge">
           In order to get some bitcoin testnet coins 🪙 you need to visit a

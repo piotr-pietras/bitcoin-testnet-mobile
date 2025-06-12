@@ -44,7 +44,6 @@ export default function TabLayout() {
         headerStyle: { backgroundColor: theme.colors.surface },
         headerTitleStyle: { color: theme.colors.onSurface },
         headerShown: false,
-        animation: "fade",
       }}
     >
       <Tabs.Screen

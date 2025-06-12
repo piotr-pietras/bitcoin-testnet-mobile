@@ -1,7 +1,7 @@
 {
   "name": "bitcoin-testnet-mobile",
   "main": "app/main.ts",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
@@ -39,7 +39,6 @@
     "expo-status-bar": "~2.2.3",
     "expo-system-ui": "~5.0.7",
     "expo-web-browser": "~14.1.6",
-    "node-libs-react-native": "^1.2.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.2",
