@@ -39,7 +39,6 @@ export const WalletCard = ({ wallet, onWalletRemoved }: Props) => {
 
   const copyToClipboard = () => {
     Clipboard.setString(wallet.address);
-    Toast.show({ type: "success", text1: "Wallet address has been copied" });
   };
 
   const blockie = useMemo(() => {
@@ -99,7 +98,7 @@ export const WalletCard = ({ wallet, onWalletRemoved }: Props) => {
             onPress={copyToClipboard}
             icon={() => (
               <Ionicons
-                name={"clipboard"}
+                name={"copy"}
                 size={theme.sizes.xm}
                 color={theme.colors.primary}
               />

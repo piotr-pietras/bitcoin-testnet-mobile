@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { Text } from "react-native-paper";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 export default function UtxosScreen() {
   const theme = useTheme();
@@ -41,28 +42,27 @@ export default function UtxosScreen() {
         }
       >
         <View style={styles.contentContainer}>
-          {filteredUtxos?.map((utxo) => (
-            <UtxoCard
-              key={utxo.tx_id}
-              utxo={utxo}
-              onPress={() => {
-                getWallet(params.id).then((wallet) => {
-                  push(`/wallet/${params.id}/utxos/${utxo.tx_id}?net=${wallet.net}`);
-                });
-              }}
-            />
+          {filteredUtxos?.map((utxo, i) => (
+            <Animated.View key={utxo.tx_id} entering={FadeIn.delay(50 * i)}>
+              <UtxoCard
+                utxo={utxo}
+                onPress={() => {
+                  getWallet(params.id).then((wallet) => {
+                    push(
+                      `/wallet/${params.id}/utxos/${utxo.tx_id}?net=${wallet.net}`
+                    );
+                  });
+                }}
+              />
+            </Animated.View>
           ))}
           {filteredUtxos?.length === 0 && (
             <View>
-              <Text variant="labelMedium" style={[styles.label, styles.textCenter]}>
-                It seems like you don't have any UTXOs to spent.
-              </Text>
-              <Text variant="labelMedium" style={[styles.label, styles.textCenter]}>
-                If you recently send a transaction probably your UTXO is in
-                mempool waiting to be included into a block.
-              </Text>
-              <Text variant="labelMedium" style={[styles.label, styles.textCenter]}>
-                If you don't have any coins visit a faucat to receive some.
+              <Text
+                variant="labelMedium"
+                style={[styles.label, styles.textCenter]}
+              >
+                No UTXOs found.
               </Text>
             </View>
           )}

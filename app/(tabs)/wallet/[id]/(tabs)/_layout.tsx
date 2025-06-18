@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs, } from "expo-router";
+import { Tabs } from "expo-router";
 import { Chip } from "react-native-paper";
 import { AppTheme, useTheme } from "@/services/theme";
 import { View, StyleSheet, ScrollView } from "react-native";
@@ -22,6 +22,7 @@ export default function TabLayout() {
                 v.route.name === props.state.routeNames[props.state.index];
               return (
                 <Chip
+                  hitSlop={10}
                   key={v.route.name}
                   showSelectedOverlay
                   onPress={() => v.navigation.navigate(v.route.name)}
@@ -75,6 +76,17 @@ export default function TabLayout() {
         name="utxos"
         options={{
           title: "UTXOs",
+          freezeOnBlur: true,
+        }}
+      />
+      <Tabs.Screen
+        name="info/index"
+        options={{
+          sceneStyle: {
+            paddingTop: top,
+            backgroundColor: theme.colors.background,
+          },
+          title: "Info",
           freezeOnBlur: true,
         }}
       />

@@ -55,9 +55,7 @@ export const WebViewMempool = ({ uri }: Props) => {
           rotate
           size={theme.sizes.l}
           style={styles.refresh}
-          onPress={() => {
-            webview.current?.reload();
-          }}
+          onPress={() => webview.current?.reload()}
           icon={() => (
             <Ionicons
               size={theme.sizes.l}

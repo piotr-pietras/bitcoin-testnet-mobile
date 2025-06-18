@@ -11,6 +11,7 @@ import {
 import { AccountBTC } from "@/services/btc/AccountBTC";
 import { saveWallet } from "@/services/storage";
 import { Net } from "@/types/global";
+import { hexToUint8Array } from "@/services/uint8Array";
 
 type ContextValues =
   | {
@@ -28,6 +29,10 @@ type ContextValues =
       setName: Dispatch<SetStateAction<string>>;
       phrase: string;
       setPhrase: Dispatch<SetStateAction<string>>;
+      privetKey: string;
+      setPrivetKey: Dispatch<SetStateAction<string>>;
+      seedType: "keywords" | "privetKey";
+      setSeedType: Dispatch<SetStateAction<"keywords" | "privetKey">>;
     }
   | undefined;
 
@@ -39,7 +44,11 @@ export const NewWalletContext = (props: PropsWithChildren) => {
   const [net, setNet] = useState<Net>("TEST");
   const [type, setType] = useState<"p2pkh" | "p2wpkh">("p2wpkh");
   const [phrase, setPhrase] = useState("");
+  const [privetKey, setPrivetKey] = useState("");
   const [name, setName] = useState("");
+  const [seedType, setSeedType] = useState<"keywords" | "privetKey">(
+    "keywords"
+  );
 
   const nextStep = () => {
     replace(`/new-wallet/step${step + 1}` as any);
@@ -55,12 +64,20 @@ export const NewWalletContext = (props: PropsWithChildren) => {
     setName("");
   };
   const generateNewWallet = () => {
-    const privKey = sha256(phrase);
+    let privKey;
+    if (seedType === "keywords") {
+      privKey = sha256(phrase);
+    } else {
+      privKey = hexToUint8Array(privetKey);
+    }
     const account = new AccountBTC(privKey, net, type);
     return saveWallet(privKey, account.address, type, net, name);
   };
 
-  const allowGenerate = !!phrase;
+  const allowGenerateKeywords = !!phrase || !(seedType === "keywords");
+  const allowGeneratePrivetKey =
+    !!privetKey.match(/^[0-9a-fA-F]{64}$/) || !(seedType === "privetKey");
+  const allowGenerate = allowGenerateKeywords && allowGeneratePrivetKey;
 
   return (
     <Context.Provider
@@ -72,13 +89,17 @@ export const NewWalletContext = (props: PropsWithChildren) => {
         step,
         allowGenerate,
         type,
+        setType,
         net,
         setNet,
-        setType,
         name,
         setName,
         phrase,
         setPhrase,
+        privetKey,
+        setPrivetKey,
+        seedType,
+        setSeedType,
       }}
     >
       {props.children}
@@ -87,5 +108,13 @@ export const NewWalletContext = (props: PropsWithChildren) => {
 };
 
 export const useNewWalletContext = () => {
-  return useContext(Context);
+  const context = useContext(Context);
+
+  if (!context) {
+    throw new Error(
+      "useNewWalletContext must be used within a NewWalletContext"
+    );
+  }
+
+  return context;
 };

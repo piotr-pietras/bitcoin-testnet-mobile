@@ -1,6 +1,5 @@
 import { Modal, ModalRef } from "@/components/Modal";
 import { WebViewMempool } from "@/components/WebViewMempool";
-import { useUnmountOnBlur } from "@/hooks/useUnmountOnBlur";
 import {
   getInfoFaucat,
   getWallet,
@@ -13,7 +12,6 @@ import { useGlobalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
-import Animated, { FadeIn } from "react-native-reanimated";
 
 export default function WalletsScreen() {
   const infoFaucatModal = useRef<ModalRef>(null);
@@ -49,7 +47,7 @@ export default function WalletsScreen() {
       </View>
       <Modal ref={infoFaucatModal}>
         <Text variant="bodyLarge">
-          In order to get some bitcoin testnet coins 🪙 you need to visit a
+          🪙 In order to get some bitcoin testnet coins you need to visit a
           testnet faucats.
         </Text>
         <View style={styles.okContainer}>

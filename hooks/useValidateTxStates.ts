@@ -68,8 +68,6 @@ const validateStates = async (states: ValidationStates) => {
   if (states.address && error.get("INVALID_RECIPIENT")) {
     sectionError.set("address", "Invalid bitcoin address");
   }
-  if (states.selectedUtxos && states.selectedUtxos.length === 0)
-    sectionError.set("amount", "No UTXOs selected");
 
   if (states.amount && error.get("NOT_ENOUGH_FUNDS"))
     sectionError.set("amount", "Not enough funds");
@@ -77,6 +75,9 @@ const validateStates = async (states: ValidationStates) => {
     sectionError.set("amount", "Amount must be integer");
   if (states.amount && error.get("VALUE_IS_DUST"))
     sectionError.set("amount", "Amount is unspendable dust");
+  if (states.selectedUtxos && states.selectedUtxos.length === 0)
+    sectionError.set("amount", "No UTXOs selected");
+
   if (
     states.amount &&
     info.get("EXCHANGE_IS_DUST") &&
@@ -114,9 +115,7 @@ interface Props {
 
 export const useValidateTxStates = (props: Props) => {
   const [transaction, setTransaction] = useState<TransactionBTC | null>(null);
-  const [timeoutId, setTimeoutId] = useState<number | null>(
-    null
-  );
+  const [timeoutId, setTimeoutId] = useState<number | null>(null);
   const [error, setError] = useState<Map<keyof ValidatedSectionKeys, string>>(
     new Map()
   );

@@ -19,25 +19,25 @@ export default function Step1Screen() {
       <View style={styles.container}>
         <Section text="Testnet chain">
           <TouchableOpacity
-            onPress={() => nw?.setNet("TEST")}
+            onPress={() => nw.setNet("TEST")}
             style={styles.radio}
           >
             <View style={{ pointerEvents: "none" }}>
               <RadioButton
                 value={"TEST"}
-                status={nw?.net === "TEST" ? "checked" : "unchecked"}
+                status={nw.net === "TEST" ? "checked" : "unchecked"}
               />
             </View>
             <Text variant="labelLarge">Testnet3</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => nw?.setNet("TEST4")}
+            onPress={() => nw.setNet("TEST4")}
             style={styles.radio}
           >
             <View style={{ pointerEvents: "none" }}>
               <RadioButton
                 value={"TEST4"}
-                status={nw?.net === "TEST4" ? "checked" : "unchecked"}
+                status={nw.net === "TEST4" ? "checked" : "unchecked"}
               />
             </View>
             <Text variant="labelLarge">Testnet4</Text>
@@ -46,13 +46,13 @@ export default function Step1Screen() {
 
         <Section text="Address type">
           <TouchableOpacity
-            onPress={() => nw?.setType("p2pkh")}
+            onPress={() => nw.setType("p2pkh")}
             style={styles.radio}
           >
             <View style={{ pointerEvents: "none" }}>
               <RadioButton
                 value={"p2pkh"}
-                status={nw?.type === "p2pkh" ? "checked" : "unchecked"}
+                status={nw.type === "p2pkh" ? "checked" : "unchecked"}
               />
             </View>
             <Text variant="labelLarge" >p2pkh</Text>
@@ -61,13 +61,13 @@ export default function Step1Screen() {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => nw?.setType("p2wpkh")}
+            onPress={() => nw.setType("p2wpkh")}
             style={styles.radio}
           >
             <View style={{ pointerEvents: "none" }}>
               <RadioButton
                 value={"p2wpkh"}
-                status={nw?.type === "p2wpkh" ? "checked" : "unchecked"}
+                status={nw.type === "p2wpkh" ? "checked" : "unchecked"}
               />
             </View>
             <Text>p2wpkh</Text>
@@ -81,8 +81,8 @@ export default function Step1Screen() {
             autoCorrect={false}
             autoCapitalize={"none"}
             autoComplete={"off"}
-            value={nw?.name}
-            onChangeText={(e) => nw?.setName(e)}
+            value={nw.name}
+            onChangeText={(e) => nw.setName(e)}
             textAlignVertical="auto"
           />
         </Section>
@@ -92,7 +92,7 @@ export default function Step1Screen() {
             Cancel
           </Button>
           <Button
-            onPress={nw?.nextStep}
+            onPress={nw.nextStep}
             mode="contained"
             style={{ alignSelf: "flex-end" }}
           >

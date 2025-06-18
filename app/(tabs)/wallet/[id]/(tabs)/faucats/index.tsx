@@ -1,13 +1,7 @@
 import { AppTheme, useTheme } from "@/services/theme";
 import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { getWallet, WalletStoredInfo } from "@/services/storage";
 import { Section } from "@/components/Section";
 import { Ionicons } from "@expo/vector-icons";
@@ -37,7 +31,7 @@ export default function FaucatsScreen() {
       <View style={styles.center}>
         <Text variant="titleMedium">📢 P2PKH wallet detected</Text>
         <Text variant="bodyLarge" style={[styles.label, styles.textCenter]}>
-          Faucats do not support p2pkh wallet address. You can create a p2wpkh
+          Faucats may not support p2pkh wallet address. You can create a p2wpkh
           wallet, get coins and send to your p2pkh wallet. You can create a
           p2wpkh wallet in the wallet settings.
         </Text>
@@ -56,11 +50,11 @@ export default function FaucatsScreen() {
         <Section text="Faucats">
           <Text variant="labelMedium" style={styles.label}>
             Please note that faucats are not limitless source of coins. Even
-            though coins have no value someone put a effort to mine them.
+            though coins have no value someone put a effort to mine them. If you
+            don't need coins any more send them back to faucat.
           </Text>
           <Text variant="labelMedium" style={styles.label}>
-            You usually need to wait for some time like 24h to get new pool of
-            coins. This is mechanism that prevents abuse of faucat.
+            You are limited to get pool of coins only a day.
           </Text>
           <View style={styles.contentContainer}>
             {Object.entries(Faucats[wallet?.net as Net]).map(([key]) => (

@@ -74,7 +74,9 @@ export default function WalletsScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
-            <Text variant="labelLarge" style={styles.label}>No wallets found</Text>
+            <Text variant="labelLarge" style={styles.label}>
+              No wallets found
+            </Text>
           </View>
         )}
         itemLayoutAnimation={LinearTransition}
@@ -90,10 +92,8 @@ export default function WalletsScreen() {
         <IconButton
           size={theme.sizes.l}
           onPress={() => {
-            if (nw) {
-              nw?.startNewWallet();
-              navigate("/new-wallet/step1");
-            }
+            nw.startNewWallet();
+            navigate("/new-wallet/step1");
           }}
           style={styles.add}
           icon={() => (

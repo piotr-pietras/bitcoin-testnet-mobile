@@ -10,14 +10,11 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useFocusEffect, useGlobalSearchParams, useRouter } from "expo-router";
-import { useEffect, useRef, useState, useCallback, useMemo, useLayoutEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { ActivityIndicator, Button, Text, TextInput } from "react-native-paper";
 import Clipboard from "@react-native-clipboard/clipboard";
-import Animated, {
-  FadeIn,
-  useAnimatedKeyboard,
-} from "react-native-reanimated";
+import Animated, { FadeIn, useAnimatedKeyboard } from "react-native-reanimated";
 import { UTXO } from "@/types/global";
 import { getWallet, WalletStoredInfo } from "@/services/storage";
 import { useValidateTxStates } from "@/hooks/useValidateTxStates";
@@ -48,7 +45,11 @@ export default function TransactionScreen() {
   });
 
   const params = useGlobalSearchParams<{ id: string }>();
-  const { data: utxos, isLoading, refetch } = useGetUtxos(params.id, true, false);
+  const {
+    data: utxos,
+    isLoading,
+    refetch,
+  } = useGetUtxos(params.id, true, false);
   const spendableUtxos = utxos?.filter(
     (utxo) => !utxo.is_spent && utxo.status === "mined"
   );
@@ -61,7 +62,9 @@ export default function TransactionScreen() {
   const hasErrors = !!Object.values(error).length;
   const disabled = noUtxos || emptyState || isLoading || hasErrors;
   const hasAnySpendable =
-    !!transaction?.spendable && transaction?.spendable > 0;
+    !!transaction?.spendable &&
+    transaction?.spendable > 0 &&
+    !error.has("amount");
 
   const onSelectUtxo = (utxo: UTXO) => {
     if (selectedUtxos.includes(utxo)) {
@@ -119,108 +122,112 @@ export default function TransactionScreen() {
     >
       <View style={styles.container}>
         <Section text="Fill transaction">
-          <TextInput
-            ref={addressRef}
-            value={address}
-            right={
-              <TextInput.Icon
-                icon="clipboard"
-                onPress={() =>
-                  Clipboard.getString().then((text) => {
-                    if (text) setAddress(text);
-                  })
-                }
-              />
-            }
-            mode="outlined"
-            onChangeText={(v) => setAddress(v)}
-            label={"Address"}
-          />
-          {error.has("address") && (
-            <Text variant="labelMedium" style={styles.error}>
-              {error.get("address")}
-            </Text>
-          )}
-          {/* ---------------------------- */}
-          <TextInput
-            mode="outlined"
-            value={amount}
-            right={
-              <TextInput.Affix
-                text={`${
-                  Number(amount) / Math.pow(10, AccountBTC.decimals)
-                } btc`}
-              />
-            }
-            keyboardType="decimal-pad"
-            maxLength={14}
-            onChangeText={(v) => setAmount(v)}
-            label={"Amount (satoshi)"}
-          />
-          <View
-            style={{
-              alignItems: "center",
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text variant="labelMedium">{info.get("spendable")}</Text>
-            {hasAnySpendable && (
-              <TouchableOpacity
-                onPress={() => {
-                  if (!wallet?.type) return;
-                  const all = SizeBTC.calcSendAllAmount(
-                    wallet?.type,
-                    selectedUtxos,
-                    Number(feeRate),
-                    opReturnData
-                  );
-                  setAmount(all.toString());
-                }}
-              >
-                <Text
-                  variant="labelMedium"
-                  style={{ color: theme.colors.primary }}
-                >
-                  Send all
-                </Text>
-              </TouchableOpacity>
+          <View>
+            <TextInput
+              ref={addressRef}
+              value={address}
+              right={
+                <TextInput.Icon
+                  icon="clipboard"
+                  onPress={() =>
+                    Clipboard.getString().then((text) => {
+                      if (text) setAddress(text);
+                    })
+                  }
+                />
+              }
+              mode="outlined"
+              onChangeText={(v) => setAddress(v)}
+              label={"Address"}
+            />
+            {error.has("address") && (
+              <Text variant="labelMedium" style={styles.error}>
+                {error.get("address")}
+              </Text>
             )}
           </View>
-          {info.get("amount") && (
-            <View style={styles.info}>
-              <Text
-                variant="labelMedium"
-                style={[styles.infoText, styles.textCenter]}
-              >
-                {info.get("amount")}
-              </Text>
-            </View>
-          )}
-          {error.has("amount") && (
-            <Text variant="labelMedium" style={styles.error}>
-              {error.get("amount")}
-            </Text>
-          )}
           {/* ---------------------------- */}
-          <TextInput
-            mode="outlined"
-            value={feeRate}
-            keyboardType="decimal-pad"
-            maxLength={8}
-            onChangeText={(v) => setFeeRate(v)}
-            label={"Fee rate (sats/vB)"}
-          />
-          <Text variant="labelMedium">{info.get("fee")}</Text>
-          {error.has("feeRate") && (
-            <Text variant="labelMedium" style={styles.error}>
-              {error.get("feeRate")}
+          <View>
+            <TextInput
+              mode="outlined"
+              value={amount}
+              right={
+                <TextInput.Affix
+                  text={`${
+                    Number(amount) / Math.pow(10, AccountBTC.decimals)
+                  } btc`}
+                />
+              }
+              keyboardType="decimal-pad"
+              maxLength={14}
+              onChangeText={(v) => setAmount(v)}
+              label={"Amount (satoshi)"}
+            />
+            <View style={styles.amountInfoContainer}>
+              {hasAnySpendable && (
+                <Text variant="labelMedium">{info.get("spendable")}</Text>
+              )}
+              {hasAnySpendable && (
+                <TouchableOpacity
+                  onPress={() => {
+                    if (!wallet?.type) return;
+                    const all = SizeBTC.calcSendAllAmount(
+                      wallet?.type,
+                      selectedUtxos,
+                      Number(feeRate),
+                      opReturnData
+                    );
+                    setAmount(all.toString());
+                  }}
+                >
+                  <Text
+                    variant="labelMedium"
+                    style={{ color: theme.colors.primary }}
+                  >
+                    Send all
+                  </Text>
+                </TouchableOpacity>
+              )}
+              {info.get("amount") && (
+                <View style={styles.info}>
+                  <Text
+                    variant="labelMedium"
+                    style={[styles.infoText, styles.textCenter]}
+                  >
+                    {info.get("amount")}
+                  </Text>
+                </View>
+              )}
+              {error.has("amount") && (
+                <Text variant="labelMedium" style={styles.error}>
+                  {error.get("amount")}
+                </Text>
+              )}
+            </View>
+          </View>
+          {/* ---------------------------- */}
+          <View>
+            <TextInput
+              mode="outlined"
+              value={feeRate}
+              keyboardType="decimal-pad"
+              maxLength={8}
+              onChangeText={(v) => setFeeRate(v)}
+              label={"Fee rate (sats/vB)"}
+            />
+            {!error.has("feeRate") && (
+              <Text variant="labelMedium">{info.get("fee")}</Text>
+            )}
+            {error.has("feeRate") && (
+              <Text variant="labelMedium" style={styles.error}>
+                {error.get("feeRate")}
+              </Text>
+            )}
+            <Text variant="labelSmall" style={styles.label}>
+              1 sats/vB is usually enough for testnet to include tx into first
+              block
             </Text>
-          )}
-          <Text variant="labelSmall" style={styles.label}>
-            1 sats/vB is usually enough for testnet to include tx into first
-            block
-          </Text>
+          </View>
           {/* ---------------------------- */}
           {more && (
             <Animated.View
@@ -255,6 +262,7 @@ export default function TransactionScreen() {
               )}
             </Animated.View>
           )}
+
           <View style={{ alignItems: "flex-end" }}>
             <Button onPress={() => setMore(!more)}>
               {more ? "Less" : "More"}
@@ -278,7 +286,10 @@ export default function TransactionScreen() {
                   </View>
                 )}
                 ListEmptyComponent={() => (
-                  <Text variant="bodyMedium" style={[styles.label, styles.textCenter]}>
+                  <Text
+                    variant="bodyMedium"
+                    style={[styles.label, styles.textCenter]}
+                  >
                     No mined UTXOs to spent
                   </Text>
                 )}
@@ -288,6 +299,7 @@ export default function TransactionScreen() {
                 keyExtractor={(item) => item.tx_id}
                 numColumns={2}
                 scrollEnabled={false}
+                entering={FadeIn}
                 renderItem={({ item }) => (
                   <UtxoCard
                     key={item.tx_id}
@@ -364,5 +376,11 @@ const stylesBuilder = (theme: AppTheme) =>
     },
     infoText: {
       color: theme.colors.onTertiaryContainer,
+    },
+    amountInfoContainer: {
+      alignItems: "center",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      flexWrap: "wrap",
     },
   });

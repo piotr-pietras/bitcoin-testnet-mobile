@@ -1,10 +1,9 @@
 import { useCallback } from "react";
 import { Card as PaperCard } from "react-native-paper";
-import { GestureResponderEvent, TouchableOpacity } from "react-native";
 import { Props as PaperCardProps } from "react-native-paper/lib/typescript/components/Card/Card";
 import Animated, {
   cancelAnimation,
-  runOnJS,
+  FadeIn,
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
@@ -42,6 +41,7 @@ export default function Card(props: Props) {
   return (
     <AnimatedPaperCard
       {...props}
+      entering={FadeIn}
       elevation={0}
       onPressIn={(e) => handlePress(0.9, 0.66)}
       onPressOut={(e) => handlePress(1, 1)}
