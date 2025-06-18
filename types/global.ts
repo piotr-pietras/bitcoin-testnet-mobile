@@ -31,3 +31,5 @@ export const Faucats: { [keys in Net]: { [keys in string]: string } } = {
     // "tbtc.bitaps.com": "https://tbtc.bitaps.com/",
   },
 } as const;
+
+export const BLOCK_DAEMON_REFETCH_INTERVAL = 10 * 1000;

@@ -1,6 +1,7 @@
 import { queryClient } from "@/services/tanstack";
 import { TransactionBTC } from "@/services/btc/TransactionBTC";
 import { useMutation } from "@tanstack/react-query";
+import { BLOCK_DAEMON_REFETCH_INTERVAL } from "@/types/global";
 
 export const useSubmitTx = (
   walletId: string,
@@ -13,7 +14,7 @@ export const useSubmitTx = (
     onSuccess: () => {
       setTimeout(async () => {
         await queryClient.refetchQueries({ queryKey: ["utxos", walletId, "true-false"] });
-      }, 5000);
+      }, BLOCK_DAEMON_REFETCH_INTERVAL);
     },
   });
 };

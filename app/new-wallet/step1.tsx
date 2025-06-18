@@ -15,7 +15,7 @@ export default function Step1Screen() {
   const { dismiss } = useRouter();
 
   return (
-    <ScrollView>
+    <ScrollView keyboardShouldPersistTaps="handled">
       <View style={styles.container}>
         <Section text="Testnet chain">
           <TouchableOpacity
@@ -29,6 +29,9 @@ export default function Step1Screen() {
               />
             </View>
             <Text variant="labelLarge">Testnet3</Text>
+            <Text variant="labelLarge" style={styles.label}>
+              confirmation time ~5 seconds
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => nw.setNet("TEST4")}
@@ -41,6 +44,9 @@ export default function Step1Screen() {
               />
             </View>
             <Text variant="labelLarge">Testnet4</Text>
+            <Text variant="labelLarge" style={styles.label}>
+              confirmation time ~10 minutes
+            </Text>
           </TouchableOpacity>
         </Section>
 

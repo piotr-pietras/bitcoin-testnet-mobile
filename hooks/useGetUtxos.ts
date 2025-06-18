@@ -1,6 +1,6 @@
 import { btcApi, GetUtxos } from "@/services/api/btc";
 import { getWallet, WalletStoredInfo } from "@/services/storage";
-import { UTXO } from "@/types/global";
+import { BLOCK_DAEMON_REFETCH_INTERVAL, UTXO } from "@/types/global";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { useRefetchDebounce } from "./useRefetchDebounce";
@@ -8,7 +8,7 @@ import { queryClient } from "@/services/tanstack";
 
 export const useGetUtxos = (id: string, mempool?: boolean, spent?: boolean) => {
   const [wallet, setWallet] = useState<WalletStoredInfo | undefined>(undefined);
-  const { refetch, canRefetch, restart } = useRefetchDebounce(6);
+  const { refetch, canRefetch, restart } = useRefetchDebounce(BLOCK_DAEMON_REFETCH_INTERVAL);
 
   const queryKey = useMemo(() => {
     restart();
@@ -24,7 +24,7 @@ export const useGetUtxos = (id: string, mempool?: boolean, spent?: boolean) => {
   return useQuery({
     enabled: !!wallet,
     queryKey,
-    staleTime: 6 * 1000,
+    staleTime: BLOCK_DAEMON_REFETCH_INTERVAL,
     queryFn: async () => {
       refetch();
       if (!canRefetch) {

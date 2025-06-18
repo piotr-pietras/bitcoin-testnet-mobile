@@ -73,12 +73,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="utxos"
-        options={{
-          title: "UTXOs",
-        }}
-      />
-      <Tabs.Screen
         name="info/index"
         options={{
           sceneStyle: {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export const useRefetchDebounce = (seconds: number) => {
+export const useRefetchDebounce = (ms: number) => {
   const [canRefetch, setCanRefetch] = useState<boolean>(true);
   const [lastlyFetched, setLastlyFetched] = useState<number>(0);
 
@@ -20,7 +20,7 @@ export const useRefetchDebounce = (seconds: number) => {
     let interval: number;
     if (!canRefetch) {
       interval = setInterval(() => {
-        if (Date.now() - lastlyFetched > seconds * 1000) {
+        if (Date.now() - lastlyFetched > ms) {
           setCanRefetch(true);
           clearInterval(interval);
         }

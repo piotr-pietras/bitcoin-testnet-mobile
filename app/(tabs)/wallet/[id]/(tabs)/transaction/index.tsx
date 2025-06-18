@@ -69,10 +69,6 @@ export default function TransactionScreen() {
   const emptyState = !address || !amount || !feeRate || !selectedUtxos.length;
   const hasErrors = !!Object.values(error).length;
   const disabled = noUtxos || emptyState || isLoading || hasErrors;
-  const hasAnySpendable =
-    !!transaction?.spendable &&
-    transaction?.spendable > 0 &&
-    !error.has("amount");
 
   const onSelectUtxo = (utxo: UTXO) => {
     if (selectedUtxos.includes(utxo)) {
@@ -130,6 +126,7 @@ export default function TransactionScreen() {
 
   return (
     <ScrollView
+      keyboardShouldPersistTaps="handled"
       refreshControl={
         <RefreshControl onRefresh={() => refetch()} refreshing={isLoading} />
       }
@@ -178,30 +175,34 @@ export default function TransactionScreen() {
               label={"Amount (satoshi)"}
             />
             <View style={styles.amountInfoContainer}>
-              {hasAnySpendable && (
+              {!error.has("amount") && (
                 <Text variant="labelMedium">{info.get("spendable")}</Text>
               )}
-              {hasAnySpendable && (
-                <TouchableOpacity
-                  onPress={() => {
-                    if (!wallet?.type) return;
-                    const all = SizeBTC.calcSendAllAmount(
-                      wallet?.type,
-                      selectedUtxos,
-                      Number(feeRate),
-                      opReturnData
-                    );
-                    setAmount(all.toString());
-                  }}
-                >
-                  <Text
-                    variant="labelMedium"
-                    style={{ color: theme.colors.primary }}
-                  >
-                    Send all
-                  </Text>
-                </TouchableOpacity>
+              {error.has("amount") && (
+                <Text variant="labelMedium" style={styles.error}>
+                  {error.get("amount")}
+                </Text>
               )}
+              <TouchableOpacity
+                onPress={() => {
+                  if (!wallet?.type) return;
+                  const all = SizeBTC.calcSendAllAmount(
+                    wallet?.type,
+                    selectedUtxos,
+                    Number(feeRate),
+                    opReturnData
+                  );
+                  setAmount(Math.max(all, 0).toString());
+                }}
+              >
+                <Text
+                  variant="labelMedium"
+                  style={{ color: theme.colors.primary }}
+                >
+                  Send all
+                </Text>
+              </TouchableOpacity>
+
               {info.get("amount") && (
                 <View style={styles.info}>
                   <Text
@@ -211,11 +212,6 @@ export default function TransactionScreen() {
                     {info.get("amount")}
                   </Text>
                 </View>
-              )}
-              {error.has("amount") && (
-                <Text variant="labelMedium" style={styles.error}>
-                  {error.get("amount")}
-                </Text>
               )}
             </View>
           </View>
@@ -303,6 +299,7 @@ export default function TransactionScreen() {
           ) : (
             <View>
               <Animated.FlatList
+                keyboardShouldPersistTaps="handled"
                 ListHeaderComponent={() => (
                   <View>
                     <Text variant="labelMedium">{info.get("utxos")}</Text>
@@ -341,6 +338,7 @@ export default function TransactionScreen() {
               {/* ---------------------------- */}
               {!!pendingUtxos?.length && <View style={styles.separator} />}
               <Animated.FlatList
+                keyboardShouldPersistTaps="handled"
                 data={pendingUtxos}
                 columnWrapperStyle={{ gap: theme.sizes.m }}
                 contentContainerStyle={{ gap: theme.sizes.m }}

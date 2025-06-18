@@ -21,7 +21,7 @@ export default function Step2Screen() {
   };
 
   return (
-    <ScrollView>
+    <ScrollView keyboardShouldPersistTaps="handled">
       <View style={styles.container}>
         <SegmentedButtons
           value={nw.seedType}
