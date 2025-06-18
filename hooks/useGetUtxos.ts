@@ -2,10 +2,18 @@ import { btcApi, GetUtxos } from "@/services/api/btc";
 import { getWallet, WalletStoredInfo } from "@/services/storage";
 import { UTXO } from "@/types/global";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRefetchDebounce } from "./useRefetchDebounce";
+import { queryClient } from "@/services/tanstack";
 
 export const useGetUtxos = (id: string, mempool?: boolean, spent?: boolean) => {
   const [wallet, setWallet] = useState<WalletStoredInfo | undefined>(undefined);
+  const { refetch, canRefetch, restart } = useRefetchDebounce(6);
+
+  const queryKey = useMemo(() => {
+    restart();
+    return ["utxos", wallet?.id, `${!!mempool}-${!!spent}`];
+  }, [wallet?.id, mempool, spent]);
 
   useEffect(() => {
     getWallet(id).then((v) => {
@@ -15,10 +23,25 @@ export const useGetUtxos = (id: string, mempool?: boolean, spent?: boolean) => {
 
   return useQuery({
     enabled: !!wallet,
-    queryKey: ["utxos", wallet?.id, `${!!mempool}-${!!spent}`],
-    staleTime: 10000,
-    queryFn: async () =>
-      await btcApi.getUtxos(wallet!.address, wallet!.net, !!mempool, !!spent),
+    queryKey,
+    staleTime: 6 * 1000,
+    queryFn: async () => {
+      refetch();
+      if (!canRefetch) {
+        return (
+          queryClient.getQueryData<GetUtxos>(queryKey) ?? {
+            data: [],
+            total: 0,
+          }
+        );
+      }
+      return await btcApi.getUtxos(
+        wallet!.address,
+        wallet!.net,
+        !!mempool,
+        !!spent
+      );
+    },
     select,
   });
 };

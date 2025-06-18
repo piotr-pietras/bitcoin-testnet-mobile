@@ -2,8 +2,8 @@ import { UtxoCard } from "@/components/UtxoCard";
 import { useGetUtxos } from "@/hooks/useGetUtxos";
 import { getWallet } from "@/services/storage";
 import { AppTheme, useTheme } from "@/services/theme";
-import { useGlobalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useFocusEffect, useGlobalSearchParams, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   RefreshControl,
   ScrollView,
@@ -20,12 +20,18 @@ export default function UtxosScreen() {
   const params = useGlobalSearchParams<{ id: string }>();
   const styles = stylesBuilder(theme);
   const [showSpent, setShowSpent] = useState(false);
-  const { data, isLoading, refetch } = useGetUtxos(params.id, true, showSpent);
+  const { data, refetch, isLoading } = useGetUtxos(params.id, true, showSpent);
 
   const filteredUtxos = data?.filter((utxo) => {
     if (showSpent) return true;
     return !utxo.is_spent;
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
   return (
     <View style={styles.container}>

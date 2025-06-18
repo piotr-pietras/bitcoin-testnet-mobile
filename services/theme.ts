@@ -18,6 +18,7 @@ export const theme = {
     success: '#79F2C0'
   },
   sizes: {
+    xs: 4,
     s: 8,
     m: 16,
     xm: 20,

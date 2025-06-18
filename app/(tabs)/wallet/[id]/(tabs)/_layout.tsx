@@ -76,7 +76,6 @@ export default function TabLayout() {
         name="utxos"
         options={{
           title: "UTXOs",
-          freezeOnBlur: true,
         }}
       />
       <Tabs.Screen

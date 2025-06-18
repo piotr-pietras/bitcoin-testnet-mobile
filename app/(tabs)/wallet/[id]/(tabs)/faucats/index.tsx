@@ -41,7 +41,6 @@ export default function FaucatsScreen() {
 
   const copyToClipboard = () => {
     Clipboard.setString(wallet.address);
-    Toast.show({ type: "success", text1: "Wallet address has been copied" });
   };
 
   return (
@@ -86,7 +85,7 @@ export default function FaucatsScreen() {
             You are going to need wallet address on faucat website. Copy it to
             clipboard with button below.
           </Text>
-          <Button icon="clipboard" onPress={copyToClipboard}>
+          <Button icon="content-copy" onPress={copyToClipboard}>
             Copy wallet address
           </Button>
         </View>

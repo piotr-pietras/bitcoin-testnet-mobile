@@ -10,15 +10,23 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useFocusEffect, useGlobalSearchParams, useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { ActivityIndicator, Button, Text, TextInput } from "react-native-paper";
+import {
+  ActivityIndicator,
+  Button,
+  Icon,
+  Text,
+  TextInput,
+} from "react-native-paper";
 import Clipboard from "@react-native-clipboard/clipboard";
 import Animated, { FadeIn, useAnimatedKeyboard } from "react-native-reanimated";
 import { UTXO } from "@/types/global";
 import { getWallet, WalletStoredInfo } from "@/services/storage";
 import { useValidateTxStates } from "@/hooks/useValidateTxStates";
 import { SizeBTC } from "@/services/btc/SizeBTC";
+import IconButton from "@/components/IconButton";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function TransactionScreen() {
   const theme = useTheme();
@@ -113,6 +121,12 @@ export default function TransactionScreen() {
       setSelectedUtxos([]);
     }
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
   return (
     <ScrollView
@@ -271,6 +285,19 @@ export default function TransactionScreen() {
         </Section>
         {/* ---------------------------- */}
         <Section text="Select UTXOs">
+          <IconButton
+            rotate={true}
+            style={styles.refresh}
+            icon={() => (
+              <Ionicons
+                name="refresh"
+                size={theme.sizes.xm}
+                color={theme.colors.primary}
+              />
+            )}
+            onPress={() => refetch()}
+            size={theme.sizes.xm}
+          />
           {isLoading ? (
             <ActivityIndicator />
           ) : (
@@ -382,5 +409,11 @@ const stylesBuilder = (theme: AppTheme) =>
       flexDirection: "row",
       justifyContent: "space-between",
       flexWrap: "wrap",
+    },
+    refresh: {
+      position: "absolute",
+      right: theme.sizes.s,
+      top: theme.sizes.xs,
+      zIndex: 1,
     },
   });

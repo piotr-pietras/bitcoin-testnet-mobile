@@ -1,10 +1,9 @@
 import { useCallback } from "react";
-import { GestureResponderEvent, TouchableOpacity } from "react-native";
-import { IconButton as PaperIconButton } from "react-native-paper";
+import { TouchableOpacity } from "react-native";
+import { Icon, IconButton as PaperIconButton } from "react-native-paper";
 import { Props as PaperIconButtonProps } from "react-native-paper/lib/typescript/components/IconButton/IconButton";
 import Animated, {
   cancelAnimation,
-  runOnJS,
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
