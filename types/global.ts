@@ -2,11 +2,12 @@ export type Blockchain = "BTC" | "ETH";
 
 export type AddressType = "p2pkh" | "p2wpkh";
 
-export type Net = "TEST" | "TEST4";
+export type Net = "TEST" | "TEST4" | "REGTEST";
 
 export const NetNamePath: { [keys in Net]: string } = {
   TEST: "testnet",
   TEST4: "testnet4",
+  REGTEST: "regtest",
 } as const;
 
 export type UTXO = {
@@ -30,6 +31,8 @@ export const Faucats: { [keys in Net]: { [keys in string]: string } } = {
     //   "https://faucet.triangleplatform.com/bitcoin/testnet",
     // "tbtc.bitaps.com": "https://tbtc.bitaps.com/",
   },
+  REGTEST: {},
 } as const;
 
 export const BLOCK_DAEMON_REFETCH_INTERVAL = 10 * 1000;
+export const REGTEST_CHECK_CONNECTION_INTERVAL = 3 * 1000;

@@ -10,6 +10,7 @@ export type ButtonSectionItem = {
   iconName: keyof typeof Ionicons.glyphMap;
   right?: ReactNode;
   onPress?: () => void;
+  disabled?: boolean;
 };
 
 type Props = {
@@ -21,11 +22,16 @@ export const ButtonSection = ({ buttons }: Props) => {
 
   return (
     <View style={styles.buttonSection}>
-      {buttons.map(({ iconName, text, onPress, right }, i) => {
+      {buttons.map(({ iconName, text, onPress, right, disabled }, i) => {
         return (
           <Animated.View key={i} entering={FadeIn.delay(100 * i)}>
-            <TouchableOpacity  onPress={onPress}>
-              <View style={styles.buttonContainer}>
+            <TouchableOpacity disabled={disabled} onPress={onPress}>
+              <View
+                style={[
+                  styles.buttonContainer,
+                  disabled && styles.buttonContainerDisabled,
+                ]}
+              >
                 <View style={styles.leftContainer}>
                   <Ionicons
                     name={iconName}
@@ -64,6 +70,9 @@ const stylesBuilder = (theme: AppTheme) =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
+    },
+    buttonContainerDisabled: {
+      opacity: 0.5,
     },
     leftContainer: {
       paddingVertical: theme.sizes.m,

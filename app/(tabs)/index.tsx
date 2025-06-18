@@ -1,6 +1,8 @@
 import IconButton from "@/components/IconButton";
+import { RegtestConnectionScreen } from "@/screens/RegtestConnectionScreen";
 import { WalletCard } from "@/components/WalletCard";
 import { useNewWalletContext } from "@/context/NewWalletContext";
+import { useRegtestContext } from "@/context/RegtestContext";
 import { getWallets, WalletStoredInfo } from "@/services/storage";
 import { AppTheme, useTheme } from "@/services/theme";
 import { Net } from "@/types/global";
@@ -14,12 +16,14 @@ import Animated, {
   LinearTransition,
   SlideInDown,
 } from "react-native-reanimated";
+import React from "react";
 
 export default function WalletsScreen() {
   const theme = useTheme();
   const styles = stylesBuilder(theme);
   const { navigate } = useRouter();
   const nw = useNewWalletContext();
+  const rc = useRegtestContext();
   const { testnet } = useLocalSearchParams();
   const [wallets, setWallets] = useState<WalletStoredInfo[]>([]);
   const [net, setNet] = useState<Net>("TEST4");
@@ -27,6 +31,7 @@ export default function WalletsScreen() {
     () => wallets.filter((v) => v.net === net),
     [wallets, net]
   );
+  const requireRegtestConnecton = net === "REGTEST" && !rc.isConnected;
 
   const loadWallets = () => {
     getWallets().then((v) => setWallets(v));
@@ -41,6 +46,8 @@ export default function WalletsScreen() {
       setNet("TEST");
     } else if (testnet === "TEST4") {
       setNet("TEST4");
+    } else if (testnet === "REGTEST") {
+      setNet("REGTEST");
     }
   }, [testnet]);
 
@@ -58,6 +65,10 @@ export default function WalletsScreen() {
         onValueChange={(v) => setNet(v as Net)}
         buttons={[
           {
+            value: "REGTEST",
+            label: "Regtest",
+          },
+          {
             value: "TEST",
             label: "Testnet3",
           },
@@ -67,47 +78,57 @@ export default function WalletsScreen() {
           },
         ]}
       />
-      <Animated.FlatList
-        style={styles.contentContainer}
-        data={filteredWallets}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={() => (
-          <View style={styles.emptyContainer}>
-            <Text variant="labelLarge" style={styles.label}>
-              No wallets found
-            </Text>
-          </View>
-        )}
-        itemLayoutAnimation={LinearTransition}
-        renderItem={({ item, index }) => (
-          <Animated.View key={item.id} entering={SlideInDown.delay(50 * index)}>
-            <WalletCard wallet={item} onWalletRemoved={() => loadWallets()} />
-          </Animated.View>
-        )}
-        ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
-        ListFooterComponent={() => <View style={styles.addViewAvoid} />}
-      />
-      <Animated.View entering={FadeIn}>
-        <IconButton
-          size={theme.sizes.l}
-          onPress={() => {
-            nw.startNewWallet();
-            navigate("/new-wallet/step1");
-          }}
-          style={styles.add}
-          icon={() => (
-            <Ionicons
-              name={"add-outline"}
+      {requireRegtestConnecton ? (
+        <RegtestConnectionScreen />
+      ) : (
+        <>
+          <Animated.FlatList
+            style={styles.contentContainer}
+            data={filteredWallets}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={() => (
+              <View style={styles.emptyContainer}>
+                <Text variant="labelLarge" style={styles.label}>
+                  No wallets found
+                </Text>
+              </View>
+            )}
+            itemLayoutAnimation={LinearTransition}
+            renderItem={({ item, index }) => (
+              <Animated.View
+                key={item.id}
+                entering={SlideInDown.delay(50 * index)}
+              >
+                <WalletCard
+                  wallet={item}
+                  onWalletRemoved={() => loadWallets()}
+                />
+              </Animated.View>
+            )}
+            ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
+            ListFooterComponent={() => <View style={styles.addViewAvoid} />}
+          />
+
+          <Animated.View entering={FadeIn}>
+            <IconButton
               size={theme.sizes.l}
-              color={theme.colors.onPrimary}
+              onPress={() => {
+                nw.startNewWallet();
+                navigate("/new-wallet/step1");
+              }}
+              style={styles.add}
+              icon={() => (
+                <Ionicons
+                  name={"add-outline"}
+                  size={theme.sizes.l}
+                  color={theme.colors.onPrimary}
+                />
+              )}
             />
-          )}
-        />
-      </Animated.View>
-      <Text style={styles.bottomLabel}>
-        Powered by Mempool, Blockdaemon, bitcoin-js
-      </Text>
+          </Animated.View>
+        </>
+      )}
     </View>
   );
 }
@@ -116,7 +137,6 @@ const stylesBuilder = (theme: AppTheme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background,
     },
     emptyContainer: {
       flex: 1,
@@ -144,13 +164,6 @@ const stylesBuilder = (theme: AppTheme) =>
     },
     label: {
       color: theme.colors.onSurfaceVariant,
-    },
-    bottomLabel: {
-      position: "absolute",
-      width: "100%",
-      bottom: 0,
-      color: theme.colors.onSurfaceVariant,
-      textAlign: "center",
     },
     info: {
       position: "absolute",

@@ -4,24 +4,20 @@ import { StyleSheet, View } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { useRouter } from "expo-router";
 import { Text } from "react-native-paper";
+import React from "react";
+import { useRegtestContext } from "@/context/RegtestContext";
 
 export default function MoreScreen() {
   const theme = useTheme();
   const styles = stylesBuilder(theme);
   const { navigate } = useRouter();
+  const rt = useRegtestContext();
 
   return (
     <>
       <View style={styles.container}>
         <ButtonSection
           buttons={[
-            // {
-            //   text: "Faucats",
-            //   iconName: "water",
-            //   onPress() {
-            //     navigate("/(tabs)/more/faucats");
-            //   },
-            // },
             {
               text: "Source code",
               iconName: "logo-github",
@@ -29,6 +25,14 @@ export default function MoreScreen() {
                 WebBrowser.openBrowserAsync(
                   "https://github.com/piotr-pietras/bitcoin-testnet-mobile"
                 );
+              },
+            },
+            {
+              text: "Disconnect regtest",
+              iconName: "server-outline",
+              disabled: !rt.isConnected,
+              onPress() {
+                rt.disconnect();
               },
             },
           ]}

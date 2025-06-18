@@ -76,6 +76,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="wallet/[id]/[net]/(tabs)"
+        options={{
+          href: null,
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
         name="wallet/[id]/(tabs)"
         options={{
           href: null,

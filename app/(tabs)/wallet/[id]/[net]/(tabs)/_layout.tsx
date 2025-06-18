@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs } from "expo-router";
+import { Tabs, useGlobalSearchParams, useLocalSearchParams } from "expo-router";
 import { Chip } from "react-native-paper";
 import { AppTheme, useTheme } from "@/services/theme";
 import { View, StyleSheet, ScrollView } from "react-native";
@@ -11,6 +11,7 @@ export default function TabLayout() {
   const theme = useTheme();
   const styles = stylesBuilder(theme);
   const { top } = useSafeAreaInsets();
+  const { net } = useGlobalSearchParams();
 
   return (
     <Tabs
@@ -18,8 +19,12 @@ export default function TabLayout() {
         <View style={styles.container}>
           <ScrollView horizontal>
             {Object.values(props.descriptors).map((v) => {
+              if (v.route.name === "faucats" && net === "REGTEST") {
+                return;
+              }
               const selected =
                 v.route.name === props.state.routeNames[props.state.index];
+
               return (
                 <Chip
                   hitSlop={10}

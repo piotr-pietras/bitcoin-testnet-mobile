@@ -20,6 +20,7 @@ export default function SubmitScreen() {
   const { navigate } = useRouter();
   const params = useGlobalSearchParams<{
     id: string;
+    net: Net;
     address: string;
     amount: string;
     feeRate: string;
@@ -145,11 +146,11 @@ export default function SubmitScreen() {
           <TouchableOpacity
             onPress={() =>
               navigate({
-                pathname: "/(tabs)/wallet/[id]/(tabs)/transaction/[txId]",
+                pathname: "/(tabs)/wallet/[id]/[net]/(tabs)/transaction/[txId]",
                 params: {
                   id: params.id,
+                  net: params.net,
                   txId,
-                  net,
                 },
               })
             }
@@ -176,8 +177,7 @@ const stylesBuilder = (theme: AppTheme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      padding: theme.sizes.m,
-      margin: theme.sizes.m,
+      paddingHorizontal: theme.sizes.l,
       gap: theme.sizes.m,
     },
     error: {

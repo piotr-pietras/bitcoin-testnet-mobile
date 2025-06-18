@@ -1,17 +1,10 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import WebView from "react-native-webview";
 import { StyleSheet, View } from "react-native";
 import { AppTheme, useTheme } from "@/services/theme";
 import { Ionicons } from "@expo/vector-icons";
 import IconButton from "./IconButton";
-import Animated, { FadeIn } from "react-native-reanimated";
-import { ActivityIndicator } from "react-native-paper";
+import { ActivityIndicator, Text } from "react-native-paper";
 import { useFocusEffect } from "expo-router";
 
 type Props = {
@@ -50,6 +43,9 @@ export const WebViewMempool = ({ uri }: Props) => {
           <ActivityIndicator size="large" />
         </View>
       )}
+      <Text variant="labelSmall" style={styles.topLabel}>
+        Powered by Mempool.space
+      </Text>
       <View style={styles.container}>
         <IconButton
           rotate
@@ -135,5 +131,11 @@ const stylesBuilder = (theme: AppTheme) =>
       right: theme.sizes.m,
       zIndex: 1,
       backgroundColor: theme.colors.primary,
+    },
+    topLabel: {
+      marginTop: theme.sizes.xs,
+      width: "100%",
+      color: theme.colors.onSurfaceVariant,
+      textAlign: "center",
     },
   });

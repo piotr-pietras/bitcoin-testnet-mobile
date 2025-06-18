@@ -23,7 +23,10 @@ export default function Layout() {
         }}
       />
       <Stack.Screen name="submit" options={{ title: "Submit" }} />
-      <Stack.Screen name="[txId]/index" options={{ title: "Transaction" }} />
+      <Stack.Screen
+        name="[txId]/index"
+        options={{ title: "Transaction", contentStyle: { paddingTop: 0 } }}
+      />
     </Stack>
   );
 }

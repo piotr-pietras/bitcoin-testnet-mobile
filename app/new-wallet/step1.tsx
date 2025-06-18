@@ -19,6 +19,21 @@ export default function Step1Screen() {
       <View style={styles.container}>
         <Section text="Testnet chain">
           <TouchableOpacity
+            onPress={() => nw.setNet("REGTEST")}
+            style={styles.radio}
+          >
+            <View style={{ pointerEvents: "none" }}>
+              <RadioButton
+                value={"REGTEST"}
+                status={nw.net === "REGTEST" ? "checked" : "unchecked"}
+              />
+            </View>
+            <Text variant="labelLarge">Regtest</Text>
+            <Text variant="labelLarge" style={styles.label}>
+              block generation by demand
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             onPress={() => nw.setNet("TEST")}
             style={styles.radio}
           >
@@ -61,7 +76,7 @@ export default function Step1Screen() {
                 status={nw.type === "p2pkh" ? "checked" : "unchecked"}
               />
             </View>
-            <Text variant="labelLarge" >p2pkh</Text>
+            <Text variant="labelLarge">p2pkh</Text>
             <Text variant="labelLarge" style={styles.label}>
               (legacy)
             </Text>

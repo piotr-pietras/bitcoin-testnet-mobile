@@ -55,10 +55,22 @@ export const btcApi = {
     return res.data;
   },
 
+  // @deprecated
   async submitSignedTx(tx: string, net: Net): Promise<{ id: string }> {
     const client = await universalBtcApiClient(net);
     const payload = JSON.stringify({ tx });
     const res = await client.post("/tx/send", payload);
     return res.data;
   },
+
+  // async submitSignedTx(tx: string, net: Net): Promise<{ id: string }> {
+  //   const client = await nativeBtcApiClient(net);
+  //   const res = await client.post("/", {
+  //     jsonrpc: "2.0",
+  //     id: 1,
+  //     method: "sendrawtransaction",
+  //     params: [tx],
+  //   });
+  //   return res.data;
+  // },
 } as const;

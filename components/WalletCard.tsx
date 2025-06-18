@@ -25,8 +25,8 @@ export const WalletCard = ({ wallet, onWalletRemoved }: Props) => {
   const { navigate } = useRouter();
   const onPress = () => {
     navigate({
-      pathname: "/wallet/[id]/(tabs)/" as any,
-      params: { id: wallet.id },
+      pathname: "/wallet/[id]/[net]/(tabs)/" as any,
+      params: { id: wallet.id, net: wallet.net },
     });
   };
 

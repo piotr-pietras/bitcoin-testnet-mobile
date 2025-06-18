@@ -21,7 +21,7 @@ import {
 } from "react-native-paper";
 import Clipboard from "@react-native-clipboard/clipboard";
 import Animated, { FadeIn, useAnimatedKeyboard } from "react-native-reanimated";
-import { UTXO } from "@/types/global";
+import { Net, UTXO } from "@/types/global";
 import { getWallet, WalletStoredInfo } from "@/services/storage";
 import { useValidateTxStates } from "@/hooks/useValidateTxStates";
 import { SizeBTC } from "@/services/btc/SizeBTC";
@@ -52,7 +52,7 @@ export default function TransactionScreen() {
     selectedUtxos,
   });
 
-  const params = useGlobalSearchParams<{ id: string }>();
+  const params = useGlobalSearchParams<{ id: string; net: Net }>();
   const {
     data: utxos,
     isLoading,
@@ -80,9 +80,10 @@ export default function TransactionScreen() {
 
   const onCreateTransaction = () => {
     navigate({
-      pathname: `/wallet/[id]/transaction/submit`,
+      pathname: `/wallet/[id]/[net]/transaction/submit`,
       params: {
         id: params.id,
+        net: params.net,
         address,
         amount,
         feeRate,

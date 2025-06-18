@@ -26,7 +26,7 @@ export default function WalletsScreen() {
   }, [params.id]);
 
   useEffect(() => {
-    if (!wallet) return;
+    if (!wallet || wallet.net === "REGTEST") return;
     getInfoFaucat().then((v) => {
       if (!v) {
         infoFaucatModal.current?.open();
@@ -74,6 +74,7 @@ const stylesBuilder = (theme: AppTheme) =>
   StyleSheet.create({
     container: {
       flex: 1,
+      marginTop: theme.sizes.m,
     },
     okContainer: {
       flexDirection: "row",
